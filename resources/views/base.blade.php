@@ -16,8 +16,8 @@
         <link href="{{ asset('assets/css/tabler-vendors.rtl.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('assets/css/demo.rtl.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet"/>
-        @section('sidebar')
-        @endsection
+        @yield('sidebar')
+        @yield('styles')
     </head>
     <body class="antialiased" id="mainBody">
         <div class="wrapper">
@@ -66,8 +66,7 @@
     </body>
 </html>
 
-@section('scripts')
-@endsection
+@yield('scripts')
 
 <script src="{{ asset('assets/js/tabler.min.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>

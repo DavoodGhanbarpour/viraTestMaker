@@ -13,6 +13,7 @@
             '403'       => [ 'type' => 'danger', 'message' => 'اطلاعات ورودی اشتباه است' ],
 
             '405'       => [ 'type' => 'danger', 'message' => 'شما دسترسی لازم را ندارید' ],
+            '406'       => [ 'type' => 'danger', 'message' => 'فایل ارسالی مجاز نمی باشد' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];

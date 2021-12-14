@@ -4,8 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class AuthenticateUserRole
+class Admin
 {
     /**
      * Handle an incoming request.
@@ -16,6 +17,9 @@ class AuthenticateUserRole
      */
     public function handle(Request $request, Closure $next)
     {
-        return $next($request);
+        if( Auth::user()->role == 'ADMIN' )
+            return $next($request);
+        else
+            return abort(403);
     }
 }

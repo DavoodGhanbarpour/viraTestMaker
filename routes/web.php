@@ -24,13 +24,15 @@ Route::post('/authenticate', [ AthenticationController::class, 'authenticate' ])
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [ DashboardController::class, 'index' ])->name('dashboard');
     Route::get('/profile', [ UserController::class, 'profile' ])->name('profile');
+    Route::post('/updateProfile', [ UserController::class, 'updateProfile' ])->name('updateProfile');
 
 
-
-    Route::get('/users', [ UserController::class, 'users' ])->name('users')->middleware('roleCheck');
-    Route::get('/user/edit/{id}', [ UserController::class, 'editUser' ])->name('editUser')->middleware('roleCheck');
-    Route::get('/user/delete/{id}', [ UserController::class, 'deleteUser' ])->name('deleteUser')->middleware('roleCheck');
-
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/users', [ UserController::class, 'users' ])->name('users');
+        Route::get('/user/edit/{id}', [ UserController::class, 'editUser' ])->name('editUser');
+        Route::get('/user/delete/{id}', [ UserController::class, 'deleteUser' ])->name('deleteUser');
+        Route::post('/user/updateUser/{id}', [ UserController::class, 'updateUser' ])->name('updateUser');
+    });
 
     Route::get('/courses', [ DashboardController::class, 'index' ])->name('courses');
     
