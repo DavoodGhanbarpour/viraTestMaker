@@ -9,7 +9,7 @@
             -
             {{ $pageTitle ?? '' }}
         </title>
-        <link rel="icon" type="image/png" href="{{ asset('assets/img/viraLogoSmall.png') }}"/>
+        <link rel="icon" type="image/png" href="{{ asset('storage/viraLogoSmall.png') }}"/>
         <link href="{{ asset('assets/css/tabler.rtl.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('assets/css/tabler-flags.rtl.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('assets/css/tabler-payments.rtl.min.css') }}" rel="stylesheet"/>
@@ -24,7 +24,8 @@
             {{-- {{ include('includes/header.blade.php') }} --}}
             {{-- {{ include('includes/navbar.blade.php') }} --}}
             @include('includes.header')
-            @include('includes.navbar')
+            
+            @include('includes.'.strtolower(Auth::user()->role).'_navbar')
             <div class="page-wrapper">
                 <div class="container-xl">
                     <div class="page-header d-print-none">

@@ -6,13 +6,13 @@
             </span>
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-            <a href="."><img src="{{ asset('assets/img/viraLogo.png') }}" height="36" alt=""></a>
+            <a href="."><img src="{{ asset('storage/viraLogo.png') }}" height="36" alt=""></a>
         </h1>
         <div class="navbar-nav flex-row order-md-last">
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
                 aria-label="Open user menu">
-                    <span class="avatar avatar-sm" style="background-image: url( {{ asset('assets/img/avatars/default.jpg') }})"></span>
+                    <span class="avatar avatar-sm" style="background-image: url( {{ asset('storage'.Auth::user()->avatar)}})"></span>
                     <div class="d-none d-xl-block ps-2">
                         <x-profile-section />
                     </div>

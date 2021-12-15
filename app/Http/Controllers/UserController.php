@@ -108,7 +108,7 @@ class UserController extends Controller
         
         if ( $request->hasFile('photo') ) 
             if( $request->file('photo')->isValid() )
-                $path = $request->file('photo')->store('avatars');
+                $path = str_replace( 'public/', '/', $request->file('photo')->store('public/avatars') );
             else
                 return back()->with('flashMessage',messageErrors( 406 ) );
 

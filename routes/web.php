@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::get('/', [ AthenticationController::class, 'index' ]);
 Route::get('/login', [ AthenticationController::class, 'index' ])->name('login');
 Route::get('/logout', [ AthenticationController::class, 'logout' ])->name('logout');
