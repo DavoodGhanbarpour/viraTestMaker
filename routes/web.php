@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\AthenticationController;
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/user/updateUser/{id}', [ UserController::class, 'updateUser' ])->name('updateUser');
     });
 
-    Route::get('/courses', [ DashboardController::class, 'index' ])->name('courses');
+    Route::get('/courses', [ CourseController::class, 'index' ])->name('courses');
+    Route::get('/course/add/{code}', [ CourseController::class, 'addCourse' ])->name('addCourse');
+    Route::get('/course/edit/{id}', [ CourseController::class, 'index' ])->name('editCourse');
+    Route::get('/course/delete/{id}', [ CourseController::class, 'index' ])->name('deleteCourse');
+    Route::get('/course/updateCourse/{id}', [ CourseController::class, 'index' ])->name('updateCourse');
     
 });

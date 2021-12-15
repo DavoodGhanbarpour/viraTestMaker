@@ -41,6 +41,22 @@
         return 1;
     }
 
+
+    function coursesLevel($level = '')
+    {
+        // $array  = [
+        //     '1'     => '',
+        //     '2'     => 'معلم',
+        //     '3'     => 'دانشجو / دانش آموز',
+        // ];
+
+        // if( !$role )
+        //     return $array;
+
+
+        // return $array[ $role ];
+    }
+
     
 
 

@@ -1,7 +1,8 @@
 @extends('base')
     @section('content')
         <div class="col-12">
-            <form action="{{ 'asdadsdsa' }}" method="post" class="card" enctype="multipart/form-data">
+            <form action="{{ '/user/updateUser/'.$id }}" method="post" class="card" enctype="multipart/form-data">
+                @csrf
                 <div class="card-body">
                     <div class="row">
                         <div class="col-6">
@@ -46,7 +47,7 @@
 
                             <fieldset class="form-fieldset">
                                 <div class="mb-3 d-flex flex-row  justify-content-center">
-                                    <img id="userIMG"  src="{{ asset('assets/img/avatars/default.jpg') }}" width="200" height="200" class="" style="border: #FFF solid 5px; border-radius: 20px" alt="avatar">
+                                    <img id="userIMG"  src="{{ asset('storage/'.$avatar) }}" width="200" height="200" class="" style="border: #FFF solid 5px; border-radius: 20px" alt="avatar">
                                 </div>
                                 <div class="mb-3">
                                     <input type="file" class="form-control" accept="image/jpeg" name="photo">
@@ -54,13 +55,12 @@
                             </fieldset>
                         </div>
                     </div>
-                    <div class=" ">
+                    <div class="d-flex justify-content-end">
                         <div class="form-footer">
-                            <button type="submit" class="btn btn-primary " id="submitButton">
-                                ثبت
-                            </button>
-                        </div>
-                    </div>
+                             <x-cancel-button/>
+                             <x-submit-button/>
+                         </div>
+                     </div>
                 </div>
 
             </form>

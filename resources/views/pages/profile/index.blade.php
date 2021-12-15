@@ -40,7 +40,7 @@
 
                             <fieldset class="form-fieldset">
                                 <div class="mb-3 d-flex flex-row  justify-content-center">
-                                    <img id="userIMG"  src="{{ asset( 'public/storage/'.$avatar ) }}" width="200" height="200" class="" style="border: #FFF solid 5px; border-radius: 20px" alt="avatar">
+                                    <img id="userIMG"  src="{{ asset( 'storage/'.$avatar ) }}" width="200" height="200" class="" style="border: #FFF solid 5px; border-radius: 20px" alt="avatar">
                                 </div>
                                 <div class="mb-3">
                                     <input type="file" class="form-control" accept="image/jpeg" name="photo">

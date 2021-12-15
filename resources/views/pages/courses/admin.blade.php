@@ -3,43 +3,51 @@
         <div class="card">
             <div class="card-body" >
                 <div class="col-12">
+                    <div class="card-body border-bottom py-3">
+                        <div class="d-flex">
+                         
+                            <div class="ms-auto ">
+                                <a href="/course/add/0" class="btn bg-teal w-100">
+                                    افزودن
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-vcenter table-mobile-md card-table">
                             <thead>
                             <tr>
-                                <th>نام و نام خانوادگی</th>
-                                <th>اطلاعات تکمیلی</th>
-                                <th>سمت</th>
+                                <th>عنوان</th>
+                                <th>دسته بندی</th>
                                 <th class="w-1"></th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($users as $eachUser)
+                            @foreach ($courses as $eachCourse)
                                 <tr>
                                     <td data-label="Name">
                                         <div class="d-flex py-1 align-items-center">
-                                            <span class="avatar me-2" style="background-image: url( {{ asset('storage'.$eachUser->avatar) }})"></span>
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachUser->name }}</div>
-                                                <div class="text-muted"><a href="#" class="text-reset">{{ $eachUser->username }}</a></div>
+                                                {{-- <div class="font-weight-medium">{{ $eachCourse->title }}</div> --}}
+                                                {{-- <div class="text-muted"><a href="#" class="text-reset">{{ $eachCourse->username }}</a></div> --}}
                                             </div>
                                         </div>
                                     </td>
                                     <td data-label="Title">
-                                        <div>{{ $eachUser->email }}</div>
-                                        <div class="text-muted">{{ $eachUser->phoneNumber }}</div>
+                                        {{-- <div>{{ $eachCourse->email }}</div> --}}
+                                        {{-- <div class="text-muted">{{ $eachCourse->phoneNumber }}</div> --}}
                                     </td>
                                     <td class="text-muted" data-label="Role">
-                                        {{ translatedRole( $eachUser->role ) }}
+                                        {{-- {{ translatedRole( $eachCourse->role ) }} --}}
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-info" href="/user/edit/{{$eachUser->id}}">
+                                            {{-- <a class="btn btn-info" href="/user/edit/{{$eachCourse->id}}">
                                                 ویرایش
                                             </a>
-                                            <a class="btn btn-danger" href="/user/delete/{{$eachUser->id}}">
+                                            <a class="btn btn-danger" href="/user/delete/{{$eachCourse->id}}">
                                                 حذف
-                                            </a>
+                                            </a> --}}
                                         </div>
                                     </td>
                                 </tr>
@@ -57,20 +65,7 @@
 @endsection
 
 @section('scripts')
-        
-    <script>
-        window.addEventListener('load', function() {
-            document.querySelector('input[type="file"]').addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    let img = document.getElementById('userIMG');
-                    img.onload = () => {
-                        URL.revokeObjectURL(img.src);
-                    }
-                    img.src = URL.createObjectURL(this.files[0]);
-                }
-            });
-        });
-    </script>
+    
 @endsection
 
         

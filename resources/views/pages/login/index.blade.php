@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>ورود - آزمون ساز ویرا</title>
-    <link rel="icon" type="image/png" href="{{ asset('assets/img/viraLogoSmall.png') }}"/>
+    <link rel="icon" type="image/png" href="{{ asset('storage/viraLogoSmall.png') }}"/>
     <link href="{{ asset('assets/css/tabler.rtl.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/tabler-flags.rtl.min.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/tabler-payments.rtl.min.css') }}" rel="stylesheet"/>
@@ -21,7 +21,7 @@
     <div class="page page-center">
       <div class="container-tight py-4">
         <div class="text-center mb-4">
-          <a href="."><img src="{{ asset('assets/img/viraLogo.png') }}" height="36" alt=""></a>
+          <a href="."><img src="{{ asset('storage/viraLogo.png') }}" height="36" alt=""></a>
         </div>
         <form class="card card-md" action="/authenticate" method="post" autocomplete="off">
           @csrf
