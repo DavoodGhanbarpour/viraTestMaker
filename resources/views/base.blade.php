@@ -67,7 +67,8 @@
     </body>
 </html>
 
-@yield('scripts')
 
 <script src="{{ asset('assets/js/tabler.min.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ asset('assets/js/libraries/minAjax.js') }}"></script>
+@yield('scripts')

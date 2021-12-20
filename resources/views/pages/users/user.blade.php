@@ -1,7 +1,7 @@
 @extends('base')
     @section('content')
         <div class="col-12">
-            <form action="{{ '/user/updateUser/'.$id }}" method="post" class="card" enctype="multipart/form-data">
+            <form action="{{ '/user/update/'.$id }}" method="post" class="card" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="row">

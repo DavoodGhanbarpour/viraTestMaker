@@ -66,3 +66,6 @@ function loadTooltips()
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 }
+
+
+

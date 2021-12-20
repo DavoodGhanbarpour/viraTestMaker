@@ -42,19 +42,19 @@
     }
 
 
-    function coursesLevel($level = '')
+    function coursesLevelTitle( $level = '' )
     {
-        // $array  = [
-        //     '1'     => '',
-        //     '2'     => 'معلم',
-        //     '3'     => 'دانشجو / دانش آموز',
-        // ];
+        $array  = [
+            '1'     => 'اصلی',
+            '2'     => 'فرعی',
+            '3'     => 'درس',
+        ];
 
-        // if( !$role )
-        //     return $array;
+        if( !$level )
+            return $array;
 
 
-        // return $array[ $role ];
+        return $array[ $level ];
     }
 
     

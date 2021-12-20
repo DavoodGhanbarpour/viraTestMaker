@@ -34,10 +34,10 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-info" href="/user/edit/{{$eachUser->id}}">
+                                            <a class="btn btn-info btn-sm" href="/user/edit/{{$eachUser->id}}">
                                                 ویرایش
                                             </a>
-                                            <a class="btn btn-danger" href="/user/delete/{{$eachUser->id}}">
+                                            <a class="btn btn-danger btn-sm" href="/user/delete/{{$eachUser->id}}">
                                                 حذف
                                             </a>
                                         </div>
