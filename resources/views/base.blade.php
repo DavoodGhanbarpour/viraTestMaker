@@ -16,6 +16,7 @@
         <link href="{{ asset('assets/css/tabler-vendors.rtl.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('assets/css/demo.rtl.min.css') }}" rel="stylesheet"/>
         <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet"/>
+        <link href="{{ asset('assets/css/persian-datepicker.min.css') }}" rel="stylesheet"/>
         @yield('sidebar')
         @yield('styles')
     </head>
@@ -70,5 +71,8 @@
 
 <script src="{{ asset('assets/js/tabler.min.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
-<script src="{{ asset('assets/js/libraries/minAjax.js') }}"></script>
+<script src="{{ asset('assets/js/libraries/jquery.js') }}"></script>
+<script src="{{ asset('assets/js/libraries/persian-datepicker.min.js') }}"></script>
+<script src="{{ asset('assets/js/libraries/persian-date.min.js') }}"></script>
+
 @yield('scripts')

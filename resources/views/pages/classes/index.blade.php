@@ -6,7 +6,7 @@
                     <div class="card-body border-bottom py-3">
                         <div class="d-flex">
                             <div class="ms-auto ">
-                                <a href="/course/add" class="btn bg-teal w-100">
+                                <a href="/class/add" class="btn bg-teal w-100">
                                     افزودن
                                 </a>
                             </div>
@@ -17,39 +17,28 @@
                             <thead>
                             <tr>
                                 <th>عنوان</th>
-                                <th>دسته بندی</th>
+                                <th>تاریخ شروع</th>
+                                <th>تاریخ پایان</th>
                                 <th class="w-1"></th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($courses as $eachCourse)
+                            @foreach ($classes as $eachClass)
                                 <tr>
-                                    <td>
+                                    <td data-label="Name">
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachCourse->title }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex py-1 align-items-center">
-                                            <div class="flex-fill">
-                                                <div class="font-weight-medium">
-                                                    @if ( $eachCourse->categoryID == 0 )
-                                                        <div>بدون دسته بندی</div>
-                                                    @else
-                                                        {{ $categories[ $eachCourse->categoryID ] }}
-                                                    @endif
-                                                </div>
+                                                <div class="font-weight-medium">{{ $eachClass->title }}</div>
+                                                <div class="text-muted">{{ $eachClass->code }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-info btn-sm" href="/course/edit/{{$eachCourse->id}}">
+                                            <a class="btn btn-info btn-sm" href="/category/edit/{{$eachClass->id}}">
                                                 ویرایش
                                             </a>
-                                            <a class="btn btn-danger btn-sm" href="/course/delete/{{$eachCourse->id}}">
+                                            <a class="btn btn-danger btn-sm" href="/category/delete/{{$eachClass->id}}">
                                                 حذف
                                             </a>
                                         </div>

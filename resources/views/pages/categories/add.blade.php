@@ -1,7 +1,7 @@
 @extends('base')
     @section('content')
         <div class="col-12">
-            <form action="/course/insert" method="post" class="card" enctype="multipart/form-data">
+            <form action="/category/insert" method="post" class="card" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="row">
@@ -12,15 +12,6 @@
                                     <label class="form-label required">عنوان</label>
                                     <input type="text" class="form-control rtl" name="title" required autocomplete="off"
                                         value=""/>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label required">دسته بندی</label>
-                                    <select class="form-control rtl" name="category" id="parentCombo" required>
-                                        <option value="0">بدون دسته بندی</option>
-                                        @foreach ($categories as $eachCategory)
-                                            <option value="{{$eachCategory->id}}">{{$eachCategory->title}}</option>
-                                        @endforeach
-                                    </select>
                                 </div>
                             </fieldset>
                         </div>

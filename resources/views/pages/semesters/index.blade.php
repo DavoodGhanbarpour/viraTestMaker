@@ -6,7 +6,7 @@
                     <div class="card-body border-bottom py-3">
                         <div class="d-flex">
                             <div class="ms-auto ">
-                                <a href="/course/add" class="btn bg-teal w-100">
+                                <a href="/semester/add" class="btn bg-teal w-100">
                                     افزودن
                                 </a>
                             </div>
@@ -17,39 +17,44 @@
                             <thead>
                             <tr>
                                 <th>عنوان</th>
-                                <th>دسته بندی</th>
+                                <th>تاریخ شروع</th>
+                                <th>تاریخ پایان</th>
+                                <th>وضعیت</th>
                                 <th class="w-1"></th>
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach ($courses as $eachCourse)
+                            @foreach ($semesters as $eachSemester)
                                 <tr>
-                                    <td>
+                                    <td data-label="Name">
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachCourse->title }}</div>
+                                                <div class="font-weight-medium">{{ $eachSemester->title }}</div>
+                                                <div class="text-muted">{{ $eachSemester->code }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="d-flex py-1 align-items-center">
-                                            <div class="flex-fill">
-                                                <div class="font-weight-medium">
-                                                    @if ( $eachCourse->categoryID == 0 )
-                                                        <div>بدون دسته بندی</div>
-                                                    @else
-                                                        {{ $categories[ $eachCourse->categoryID ] }}
-                                                    @endif
-                                                </div>
-                                            </div>
+                                    <td >
+                                        <div>{{ timestampToJalali( $eachSemester->timeStart ) }}</div>
+                                    </td>
+                                    <td >
+                                        <div>{{ timestampToJalali( $eachSemester->timeFinish ) }}</div>
+                                    </td>
+                                    <td >
+                                        <div class="flex-fill">
+                                            <div class="font-weight-medium">{{ semesterActivationTitle( $eachSemester->isActive ) }}</div>
+                                            <div class="text-muted">{{ semesterTypeTitles( $eachSemester->type ) }}</div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-info btn-sm" href="/course/edit/{{$eachCourse->id}}">
+                                            <a class="btn btn-warning btn-sm" href="/semester/activate/{{$eachSemester->id}}">
+                                                فعال سازی
+                                            </a>
+                                            <a class="btn btn-info btn-sm" href="/semester/edit/{{$eachSemester->id}}">
                                                 ویرایش
                                             </a>
-                                            <a class="btn btn-danger btn-sm" href="/course/delete/{{$eachCourse->id}}">
+                                            <a class="btn btn-danger btn-sm" href="/semester/delete/{{$eachSemester->id}}">
                                                 حذف
                                             </a>
                                         </div>

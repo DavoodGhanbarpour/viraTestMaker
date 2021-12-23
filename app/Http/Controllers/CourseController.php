@@ -31,7 +31,8 @@ class CourseController extends Controller
     {
 
         $params = [
-            'courses' => DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'courses'       => DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'categories'    => $this->assocArrayOfCategories(),
         ];
         
         return view('pages.courses.admin', $params);
@@ -39,88 +40,101 @@ class CourseController extends Controller
 
     public function teacherCourses()
     {
-        $params = [];
+        $params = [
+            'courses'       => DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'categories'    => $this->assocArrayOfCategories(),
+        ];
+        
         return view('pages.courses.teacher', $params);
     }
 
     public function studentCourses()
     {
-        $params = [];
+        $params = [
+            'courses'       => DB::table('courses')->select('*')->where(['trash', '<>', trashed()])->get()->toArray(),
+            'categories'    => $this->assocArrayOfCategories(),
+        ];
+        
         return view('pages.courses.student', $params);
     }
 
 
-    public function addCourse( $parentCode )
+    public function addCourse()
     {
         $params = [
-            'parentCourse'  => DB::table('courses')->select('*')->where([ ['trash', '<>', trashed() ], [ 'level', '=', '1' ] ])->get()->toArray(),
-            'courses'       => $this->assocArrayOfCourses(),
-            'parentCode'    => $parentCode,
+            'categories'    => DB::table('categories')->select('*')->where([ ['trash', '<>', trashed() ] ])->get()->toArray()
         ];
         return view('pages.courses.add', $params);
     }
 
-
-    public function insertCourse( Request $request )
+    public function editCourse( $courseID )
     {
-        $inputs         = $request->input(); 
-        $parentCode     =$this->getLevelByParentCode( $inputs['parent'] );
-        $dataToInsert   = [
-            'title'         => $inputs['title'],
-            'code'          => $this->getNextRowCodeByParentCode( $parentCode ),
-            'level'         => $parentCode,
-            'parent'        => $inputs['parent'],
+        $params = [
+            'categories'    => DB::table('categories')->select('*')->where([ ['trash', '<>', trashed() ] ])->get()->toArray(),
+            'course'        => DB::table('courses')->select('*')->where([ ['trash', '<>', trashed() ], ['id', '=', $courseID ] ])->get()->first(),
         ];
-       
-var_dump($dataToInsert);die;
-        $insertedID = DB::table('courses')->insertGetId($dataToInsert);
+        return view('pages.courses.edit', $params);
+    }
 
-        if( $insertedID )
+
+    
+    public function deleteCourse( $courseID )
+    {
+        $affected = DB::table('courses')
+            ->where('id', '=' ,$courseID)
+            ->update([ 'trash' => trashed() ]);
+
+        if( $affected )
             return back()->with('flashMessage', messageErrors( 200 ) );
         else
             return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
 
-
-    public function nextCourseCode( Request $request )
+    public function insertCourse( Request $request )
     {
-        return response()->json([ 
-            'nextCode' => $this->getNextRowCodeByParentCode( $request->get('parentCode') )
-        ], 200);
+        $inputs         = $request->input(); 
+        $dataToInsert   = [
+            'title'         => $inputs['title'],
+            'categoryID'    => $inputs['category'] ?? 0,
+        ];
+       
+        $insertedID = DB::table('courses')->insertGetId($dataToInsert);
+
+        if( $insertedID )
+            return redirect('/courses')->with('flashMessage', messageErrors( 200 ) );
+        else
+            return back()->with('flashMessage',messageErrors( 402 ) );
+    }
+
+    public function updateCourse( Request $request, $courseID )
+    {
+        $inputs         = $request->input(); 
+        $dataToUpdate   = [
+            'title'         => $inputs['title'],
+            'categoryID'    => $inputs['category'] ?? 0,
+        ];
+       
+        $insertedID     = DB::table('courses')->where('id',$courseID)->update($dataToUpdate);
+
+        if( $insertedID )
+            return redirect('/courses')->with('flashMessage', messageErrors( 200 ) );
+        else
+            return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
 
 
-    private function getNextRowCodeByParentCode($parent)
-    {
-        $lastCode = DB::table('courses')->select('code')->where([ ['trash', '<>', trashed() ], [ 'parent', '=', $parent ] ])->orderBy('code', 'desc')->limit(1)->first();
-
-        try {
-            if( !$lastCode->code )
-                return '1';
-        } catch (\Throwable $th) {
-            return '01';
-        }
-        
-        return $parent . $lastCode->code++;
-    }
-
-
-
-    private function assocArrayOfCourses()
+    private function assocArrayOfCategories()
     {
         $result  = [];
-        $courses = DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray();
+        $courses = DB::table('categories')->select('*')->where('trash', '<>', trashed())->get()->toArray();
         foreach ($courses as $eachCourse)
         {
-            $result[ $eachCourse->code ]['title']   = $eachCourse->title;
-            $result[ $eachCourse->code ]['level']   = $eachCourse->level;
-            $result[ $eachCourse->code ]['code']    = $eachCourse->code;
+            $result[ $eachCourse->id ]   = $eachCourse->title;
         }
-
-
         return $result;
     }
+
     
 }
