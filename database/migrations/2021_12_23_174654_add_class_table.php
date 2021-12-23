@@ -16,6 +16,7 @@ class AddClassTable extends Migration
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->string('semesterID');
             $table->string('code')->unique();
             $table->string('timeStart');
             $table->string('timeFinish');

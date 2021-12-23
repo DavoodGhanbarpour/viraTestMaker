@@ -48,9 +48,11 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-warning btn-sm" href="/semester/activate/{{$eachSemester->id}}">
-                                                فعال سازی
-                                            </a>
+                                            @if ( $eachSemester->isActive != 'true' )
+                                                <a class="btn btn-warning btn-sm" href="/semester/activate/{{$eachSemester->id}}">
+                                                    فعال سازی
+                                                </a>
+                                            @endif
                                             <a class="btn btn-info btn-sm" href="/semester/edit/{{$eachSemester->id}}">
                                                 ویرایش
                                             </a>

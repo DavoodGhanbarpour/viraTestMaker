@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/semester/delete/{id}', [ SemesterController::class, 'deleteSemester' ])->name('deleteClass');
         Route::post('/semester/insert', [ SemesterController::class, 'insertSemester' ])->name('insertSemester');
         Route::post('/semester/update/{id}', [ SemesterController::class, 'updateSemester' ])->name('updateSemester');
-        Route::post('/semester/activate/{id}', [ SemesterController::class, 'activateSemester' ])->name('activateSemester');
+        Route::get('/semester/activate/{id}', [ SemesterController::class, 'activateSemester' ])->name('activateSemester');
     });
 
     

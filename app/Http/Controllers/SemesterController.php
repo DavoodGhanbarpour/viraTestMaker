@@ -24,11 +24,10 @@ class SemesterController extends Controller
 
 
 
-    public function editSemester( $classID )
+    public function editSemester( $semesterID )
     {
-        // echo timestampToGregorian();;die;
         $params = [
-            'semester' => DB::table('semesters')->select('*')->where([ [ 'trash', '<>', trashed() ], [ 'id', '=', $classID ] ])->get()->first(),
+            'semester' => DB::table('semesters')->select('*')->where([ [ 'trash', '<>', trashed() ], [ 'id', '=', $semesterID ] ])->get()->first(),
         ];
         return view('pages.semesters.edit', $params);
     }
@@ -56,7 +55,7 @@ class SemesterController extends Controller
 
 
     
-    public function updateSemester( Request $request, $classID )
+    public function updateSemester( Request $request, $semesterID )
     {
         $inputs         = $request->input(); 
         $dataToUpdate   = [
@@ -66,7 +65,7 @@ class SemesterController extends Controller
             'type'          => $inputs['type'],
         ];
         
-        $insertedID     = DB::table('semesters')->where('id',$classID)->update($dataToUpdate);
+        $insertedID     = DB::table('semesters')->where('id',$semesterID)->update($dataToUpdate);
 
         if( $insertedID )
             return redirect('/semesters')->with('flashMessage', messageErrors( 200 ) );
@@ -75,10 +74,10 @@ class SemesterController extends Controller
     }
 
         
-    public function deleteSemester( $classID )
+    public function deleteSemester( $semesterID )
     {
         $affected = DB::table('semesters')
-        ->where('id', '=' ,$classID)
+        ->where('id', '=' ,$semesterID)
         ->update([ 'trash' => trashed() ]);
 
         if( $affected )
@@ -87,11 +86,14 @@ class SemesterController extends Controller
             return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
-    public function activateSemester( $classID )
+    public function activateSemester( $semesterID )
     {
         $affected = DB::table('semesters')
-        ->where('id', '=' ,$classID)
-        ->update([ 'trash' => trashed() ]);
+        ->update([ 'isActive' => 'false' ]);
+
+        $affected = DB::table('semesters')
+        ->where('id', '=' ,$semesterID)
+        ->update([ 'isActive' => 'true' ]);
 
         if( $affected )
             return back()->with('flashMessage', messageErrors( 200 ) );
@@ -107,4 +109,7 @@ class SemesterController extends Controller
         $lastInsertedCode++;
         return str_pad($lastInsertedCode, 7,"0", STR_PAD_LEFT);
     }
+
+
+    
 }

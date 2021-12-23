@@ -37,18 +37,19 @@ class ClassController extends Controller
 
     public function insertclass(Request $request)
     {
-        if( !$this->isAnySemesterActive() )
+        $semesterID = $this->isAnySemesterActive();
+        if( !$semesterID )
             return back()->with('flashMessage', messageErrors( 404 ) );
 
         $inputs         = $request->input(); 
         
         $dataToInsert   = [
             'title'         => $inputs['title'],
+            'semesterID'    => $semesterID,
             'code'          => $this->buildNextClassCode(),
             'timeStart'     => strtotime( toEngNumbers( $inputs['timeStart'] ) ),
             'timeFinish'    => strtotime( toEngNumbers( $inputs['timeFinish'] ) ),
         ];
-        varDumper($dataToInsert);
        
         $insertedID = DB::table('classes')->insertGetId($dataToInsert);
 
@@ -91,20 +92,19 @@ class ClassController extends Controller
 
     private function buildNextClassCode()
     {
-        $year               = Jalalian::fromCarbon(Carbon::now())->getYear();
         $lastInsertedCode   = DB::table('classes')->select('code')->where( 'trash', '<>', trashed() )->orderBy('id','desc')->get()->first()->code ?? 0;
-        $activeSemesterCode = DB::table('semesters')->select('code')->where([ [ 'trash', '<>', trashed() ], [ 'active', '=', 'true' ] ])->orderBy('id','desc')->get()->first()->code ?? 0;
-
-        return $year.$activeSemesterCode.$lastInsertedCode;
+        str_pad($lastInsertedCode, 7,"0", STR_PAD_LEFT);
+        
+        return $lastInsertedCode;
     }
 
 
     private function isAnySemesterActive()
     {
-        $activeSemester     = DB::table('semesters')->select('id')->where([ [ 'trash', '<>', trashed() ], [ 'isActive', '=', 'true' ] ])->orderBy('id','desc')->get()->first()->code ?? 0;
+        $activeSemesterID   = DB::table('semesters')->select('id')->where([ [ 'trash', '<>', trashed() ], [ 'isActive', '=', 'true' ] ])->orderBy('id','desc')->get()->first()->id ?? 0;
 
-        if( $activeSemester )
-            return true;
+        if( $activeSemesterID )
+            return $activeSemesterID;
         else 
             return false;
     }
