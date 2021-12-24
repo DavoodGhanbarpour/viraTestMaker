@@ -9,12 +9,13 @@
 
 
             '401'       => [ 'type' => 'danger', 'message' => 'اطلاعات ورودی کافی نمی باشد' ],
-            '402'       => [ 'type' => 'danger', 'message' => 'کاربر مورد نظر یافت نشد' ],
+            '402'       => [ 'type' => 'danger', 'message' => 'درج اطلاعات با خطا مواجه شد' ],
             '403'       => [ 'type' => 'danger', 'message' => 'اطلاعات ورودی اشتباه است' ],
             '404'       => [ 'type' => 'danger', 'message' => 'نیم سال تحصیلی فعالی وجود ندارد' ],
             '405'       => [ 'type' => 'danger', 'message' => 'شما دسترسی لازم را ندارید' ],
             '406'       => [ 'type' => 'danger', 'message' => 'فایل ارسالی مجاز نمی باشد' ],
             '407'       => [ 'type' => 'danger', 'message' => 'امکان حذف ترم فعال وجود ندارد' ],
+            '408'       => [ 'type' => 'danger', 'message' => 'کاربر مورد نظر یافت نشد' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];
@@ -83,6 +84,8 @@
         ';
         echo "<style>$style</style>";
         
+        $data = ( count($data) == 1 ) ? reset($data) : $data;
+
         echo '<pre>';
             var_dump($data);
         echo '</pre>';

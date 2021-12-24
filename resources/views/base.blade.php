@@ -71,6 +71,7 @@
 
 <script src="{{ asset('assets/js/tabler.min.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
+<script src="{{ asset('assets/js/libraries/minAjax.js') }}"></script>
 <script src="{{ asset('assets/js/libraries/jquery.js') }}"></script>
 <script src="{{ asset('assets/js/libraries/persian-datepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/libraries/persian-date.min.js') }}"></script>

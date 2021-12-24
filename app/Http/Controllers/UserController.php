@@ -36,7 +36,7 @@ class UserController extends Controller
     {
         $user           = DB::table('users')->select('*')->where([ [ 'trash', '<>', trashed() ], [ 'id', '=', $id ] ])->get()->first();
         if( !$user )
-            return back()->with('flashMessage', messageErrors(402) );
+            return back()->with('flashMessage', messageErrors(408) );
 
         $params             = [
             'id'            => $user->id,
@@ -71,7 +71,7 @@ class UserController extends Controller
     public function updateUser( Request $request, $id )
     {
         $inputs         = $request->input();
-        
+        $path           = null;
         if ( $request->hasFile('photo') ) 
             if( $request->file('photo')->isValid() )
                 $path = str_replace( 'public/', '/', $request->file('photo')->store('public/avatars') );
@@ -83,9 +83,9 @@ class UserController extends Controller
             'name'          => $inputs['fullName'],
             'role'          => $inputs['role'] ?? 'STUDENT',
             'phoneNumber'   => $inputs['phoneNumber'] ,
-            'avatar'        => $path ?? null,
         ];
-       
+        if( $path !== null )
+            $dataToUpdate['avatar']         = $path;
 
         if( $inputs['password'] )
             $dataToUpdate['password']       = Hash::make( $inputs['password'] );
@@ -105,7 +105,7 @@ class UserController extends Controller
     public function updateProfile( Request $request )
     {
         $inputs         = $request->input();
-        
+        $path           = null;
         if ( $request->hasFile('photo') ) 
             if( $request->file('photo')->isValid() )
                 $path = str_replace( 'public/', '/', $request->file('photo')->store('public/avatars') );
@@ -115,17 +115,18 @@ class UserController extends Controller
         $dataToUpdate   = [
             'email'         => $inputs['email'],
             'name'          => $inputs['fullName'],
-            'role'          => $inputs['role'] ?? 'STUDENT',
             'phoneNumber'   => $inputs['phoneNumber'] ,
-            'avatar'        => $path,
+            
         ];
+        if( $path !== null  )
+            $dataToUpdate['avatar']         = $path;
        
 
         if( $inputs['password'] )
             $dataToUpdate['password']       = Hash::make( $inputs['password'] );
 
         $insertedID     = DB::table('users')->where('id', Auth::user()->id )->update($dataToUpdate);
-
+        
         if( $insertedID )
             return back()->with('flashMessage', messageErrors( 200 ) );
         else

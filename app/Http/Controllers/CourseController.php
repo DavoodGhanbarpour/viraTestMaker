@@ -51,7 +51,7 @@ class CourseController extends Controller
     public function studentCourses()
     {
         $params = [
-            'courses'       => DB::table('courses')->select('*')->where(['trash', '<>', trashed()])->get()->toArray(),
+            'courses'       => DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
             'categories'    => $this->assocArrayOfCategories(),
         ];
         

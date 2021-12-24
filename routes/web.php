@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClassController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\AssignClassController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -91,15 +92,13 @@ Route::middleware(['auth'])->group(function () {
 
 
     /**
-     * Semesters
+     * Assignees
     */
 
-        Route::get('/assignees', [ SemesterController::class, 'index' ])->name('semesters');
-        Route::get('/assign/add', [ SemesterController::class, 'addSemester' ])->name('addSemester');
-        Route::get('/assign/edit/{id}', [ SemesterController::class, 'editSemester' ])->name('editSemester');
-        Route::get('/assign/delete/{id}', [ SemesterController::class, 'deleteSemester' ])->name('deleteClass');
-        Route::post('/assign/insert', [ SemesterController::class, 'insertSemester' ])->name('insertSemester');
-        Route::post('/assign/update/{id}', [ SemesterController::class, 'updateSemester' ])->name('updateSemester');
+        Route::get('/assignees', [ AssignClassController::class, 'index' ])->name('assignees');
+        Route::get('/assign/edit/{id}', [ AssignClassController::class, 'editAssignee' ])->name('editAssignee');
+        Route::post('/assign/update/{id}', [ AssignClassController::class, 'updateAssignee' ])->name('updateAssignee');
+        Route::get('/assignees/class/{classID}', [ AssignClassController::class, 'classAssignees' ])->name('classAssignees');
     });
 
     

@@ -9,113 +9,74 @@ class AssignClassController extends Controller
 {
     public function index()
     {
+        $params['classes'] =  DB::table('classes')->
+        join('users', 'users.id', '=', 'classes.teacherID')->
+        join('courses', 'courses.id', '=', 'classes.courseID')->
+        join('semesters', 'semesters.id', '=', 'classes.semesterID')->
+        join('assignees', 'assignees.classID', '=', 'classes.id')->
+        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'classes.*', 'semesters.title as semesterTitle' ])->
+        addSelect(DB::raw('count(assignees.id) as studentCount'))->
+        where([ 
+            [ 'classes.trash', '<>', trashed() ], 
+            [ 'courses.trash', '<>', trashed() ], 
+            [ 'users.trash', '<>', trashed() ], 
+            [ 'semesters.trash', '<>', trashed() ],
+            [ 'assignees.trash', '<>', trashed() ],
+        ])->groupby('assignees.classID')->get()->toArray();
+        // varDumper($params);
+
+        return view('pages.assignees.index', $params);
+    }
+
+
+
+    public function editAssignee( $classID )
+    {
+        $students   = DB::table('assignees')->select(['studentID'])->where([ [ 'assignees.trash', '<>', trashed() ], [ 'classID', '=', $classID ] ])->get()->toArray();
+        foreach ($students as $value) 
+            $assignees[] = $value->studentID;
+        
         $params = [
-            'classes' => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'classID'   => $classID,
+            'students'  => DB::table('users')->select('*')->where([ [ 'trash', '<>', trashed() ] ,[ 'role', '=', 'STUDENT' ] ])->get()->toArray(),
+            'assignees' => $assignees,
         ];
-
-        return view('pages.classes.index', $params);
+        return view('pages.assignees.edit', $params);
     }
 
 
-    public function addClass()
+    public function classAssignees( $classID )
     {
-        return view('pages.classes.add');
-    }
+        $result     = [];
+        $students   = DB::table('assignees')->join('users', 'users.id', '=', 'assignees.studentID')->select(['users.name as studentName'])->where([ [ 'assignees.trash', '<>', trashed() ],[ 'users.trash', '<>', trashed() ], [ 'classID', '=', $classID ] ])->get()->toArray();
+        foreach ($students as $value) 
+            $result[] = $value->studentName;
 
-
-
-    public function editClass( $classID )
-    {
-        $params = [
-            'class' => DB::table('classes')->select('*')->where([ [ 'trash', '<>', trashed() ], [ 'id', '=', $classID ] ])->get()->first(),
+        $params     = [
+            'assignees'   => $result,
         ];
-        return view('pages.classes.edit', $params);
-    }
-
-
-    public function insertclass(Request $request)
-    {
-        $semesterID = $this->isAnySemesterActive();
-        if( !$semesterID )
-            return back()->with('flashMessage', messageErrors( 404 ) );
-
-        $inputs         = $request->input(); 
-        $dataToInsert   = [
-            'title'         => $inputs['title'],
-            'semesterID'    => $semesterID,
-            'code'          => $this->buildNextClassCode(),
-            'timeStart'     => datepickerToTimestamp($inputs['timeStart']),
-            'timeFinish'    => datepickerToTimestamp($inputs['timeFinish']),
-        ];
-       
-        $insertedID = DB::table('classes')->insertGetId($dataToInsert);
-
-        if( $insertedID )
-            return redirect('/classes')->with('flashMessage', messageErrors( 200 ) );
-        else
-            return back()->with('flashMessage',messageErrors( 402 ) );
+        return response()->json($params,200);
     }
 
 
     
-    public function updateClass( Request $request, $classID )
+    public function updateAssignee( Request $request, $classID )
     {
-
-        $inputs         = $request->input(); 
-        
-        $dataToUpdate   = [
-            'title'         => $inputs['title'],
-            'timeStart'     => datepickerToTimestamp($inputs['timeStart']),
-            'timeFinish'    => datepickerToTimestamp($inputs['timeFinish']),
-        ];
-       
-        $insertedID     = DB::table('classes')->where('id',$classID)->update($dataToUpdate);
-
-        if( $insertedID )
-            return redirect('/classes')->with('flashMessage', messageErrors( 200 ) );
-        else
-            return back()->with('flashMessage',messageErrors( 402 ) );
-    }
-
-        
-    public function deleteClass( $classID )
-    {
-        $affected = DB::table('classes')
-        ->where('id', '=' ,$classID)
+        DB::table('assignees')
+        ->where('classID', '=' ,$classID)
         ->update([ 'trash' => trashed() ]);
 
-        if( $affected )
-            return back()->with('flashMessage', messageErrors( 200 ) );
-        else
-            return back()->with('flashMessage',messageErrors( 402 ) );
+        $inputs         = $request->input(); 
+        $dataToUpdate   = [];
+        foreach ($inputs['students'] as $eachStudentID) 
+            $dataToUpdate[]   = [
+                'classID'       => $classID,
+                'studentID'     => $eachStudentID,
+            ];
+        DB::table('assignees')->insert($dataToUpdate );
+        
+        return redirect('/assignees')->with('flashMessage', messageErrors( 200 ) );
     }
 
 
-    private function buildNextClassCode()
-    {
-        $lastInsertedCode   = DB::table('classes')->select('code')->where( 'trash', '<>', trashed() )->orderBy('code','desc')->get()->first()->code ?? 0;
-
-        $lastInsertedCode++;
-        $count                  = strlen($lastInsertedCode);
-        $lenghtOfLeadingZeros   = Config::get('constants.lenghtOfLeadingZeros');
-        $lenghtOfLeadingZeros   = $lenghtOfLeadingZeros - $count;
-
-       
-        $lastInsertedCode       = str_pad( $lastInsertedCode, $lenghtOfLeadingZeros,"0", STR_PAD_LEFT);
-        
-        
-        
-        return $lastInsertedCode;
-    }
-
-
-    private function isAnySemesterActive()
-    {
-        $activeSemesterID   = DB::table('semesters')->select('id')->where([ [ 'trash', '<>', trashed() ], [ 'isActive', '=', 'true' ] ])->orderBy('id','desc')->get()->first()->id ?? 0;
-        
-        if( $activeSemesterID )
-            return $activeSemesterID;
-        else 
-            return false;
-    }
 }
