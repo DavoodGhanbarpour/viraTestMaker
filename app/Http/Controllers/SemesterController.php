@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
 class SemesterController extends Controller
@@ -76,6 +77,11 @@ class SemesterController extends Controller
         
     public function deleteSemester( $semesterID )
     {
+        $isActive = DB::table('semesters')->select('*')->where([ [ 'trash', '<>', trashed() ], [ 'id', '=', $semesterID ] ])->get()->first()->isActive;
+        if( $isActive == 'true' )
+            return back()->with('flashMessage',messageErrors( 407 ) );
+
+
         $affected = DB::table('semesters')
         ->where('id', '=' ,$semesterID)
         ->update([ 'trash' => trashed() ]);
@@ -104,10 +110,19 @@ class SemesterController extends Controller
 
     private function buildNextClassCode()
     {
-
         $lastInsertedCode   = DB::table('semesters')->select('code')->where( 'trash', '<>', trashed() )->orderBy('code','desc')->get()->first()->code ?? 0;
+
         $lastInsertedCode++;
-        return str_pad($lastInsertedCode, 7,"0", STR_PAD_LEFT);
+        $count                  = strlen($lastInsertedCode);
+        $lenghtOfLeadingZeros   = Config::get('constants.lenghtOfLeadingZeros');
+        $lenghtOfLeadingZeros   = $lenghtOfLeadingZeros - $count;
+
+       
+        $lastInsertedCode       = str_pad( $lastInsertedCode, $lenghtOfLeadingZeros,"0", STR_PAD_LEFT);
+        
+        
+        
+        return $lastInsertedCode;
     }
 
 

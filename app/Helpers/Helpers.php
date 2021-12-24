@@ -14,6 +14,7 @@
             '404'       => [ 'type' => 'danger', 'message' => 'نیم سال تحصیلی فعالی وجود ندارد' ],
             '405'       => [ 'type' => 'danger', 'message' => 'شما دسترسی لازم را ندارید' ],
             '406'       => [ 'type' => 'danger', 'message' => 'فایل ارسالی مجاز نمی باشد' ],
+            '407'       => [ 'type' => 'danger', 'message' => 'امکان حذف ترم فعال وجود ندارد' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];

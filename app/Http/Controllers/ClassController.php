@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Morilog\Jalali\Jalalian;
 
@@ -42,13 +43,12 @@ class ClassController extends Controller
             return back()->with('flashMessage', messageErrors( 404 ) );
 
         $inputs         = $request->input(); 
-        
         $dataToInsert   = [
             'title'         => $inputs['title'],
             'semesterID'    => $semesterID,
             'code'          => $this->buildNextClassCode(),
-            'timeStart'     => strtotime( toEngNumbers( $inputs['timeStart'] ) ),
-            'timeFinish'    => strtotime( toEngNumbers( $inputs['timeFinish'] ) ),
+            'timeStart'     => datepickerToTimestamp($inputs['timeStart']),
+            'timeFinish'    => datepickerToTimestamp($inputs['timeFinish']),
         ];
        
         $insertedID = DB::table('classes')->insertGetId($dataToInsert);
@@ -63,9 +63,13 @@ class ClassController extends Controller
     
     public function updateClass( Request $request, $classID )
     {
+
         $inputs         = $request->input(); 
+        
         $dataToUpdate   = [
             'title'         => $inputs['title'],
+            'timeStart'     => datepickerToTimestamp($inputs['timeStart']),
+            'timeFinish'    => datepickerToTimestamp($inputs['timeFinish']),
         ];
        
         $insertedID     = DB::table('classes')->where('id',$classID)->update($dataToUpdate);
@@ -92,8 +96,17 @@ class ClassController extends Controller
 
     private function buildNextClassCode()
     {
-        $lastInsertedCode   = DB::table('classes')->select('code')->where( 'trash', '<>', trashed() )->orderBy('id','desc')->get()->first()->code ?? 0;
-        str_pad($lastInsertedCode, 7,"0", STR_PAD_LEFT);
+        $lastInsertedCode   = DB::table('classes')->select('code')->where( 'trash', '<>', trashed() )->orderBy('code','desc')->get()->first()->code ?? 0;
+
+        $lastInsertedCode++;
+        $count                  = strlen($lastInsertedCode);
+        $lenghtOfLeadingZeros   = Config::get('constants.lenghtOfLeadingZeros');
+        $lenghtOfLeadingZeros   = $lenghtOfLeadingZeros - $count;
+
+       
+        $lastInsertedCode       = str_pad( $lastInsertedCode, $lenghtOfLeadingZeros,"0", STR_PAD_LEFT);
+        
+        
         
         return $lastInsertedCode;
     }
@@ -102,7 +115,7 @@ class ClassController extends Controller
     private function isAnySemesterActive()
     {
         $activeSemesterID   = DB::table('semesters')->select('id')->where([ [ 'trash', '<>', trashed() ], [ 'isActive', '=', 'true' ] ])->orderBy('id','desc')->get()->first()->id ?? 0;
-
+        
         if( $activeSemesterID )
             return $activeSemesterID;
         else 
