@@ -127,8 +127,9 @@ class CourseController extends Controller
 
     private function assocArrayOfCategories()
     {
-        $result  = [];
-        $courses = DB::table('categories')->select('*')->where('trash', '<>', trashed())->get()->toArray();
+        $result         = [];
+        $courses        = DB::table('categories')->select('*')->where('trash', '<>', trashed())->get()->toArray();
+        $result['']     = 'بدون عنوان';
         foreach ($courses as $eachCourse)
         {
             $result[ $eachCourse->id ]   = $eachCourse->title;

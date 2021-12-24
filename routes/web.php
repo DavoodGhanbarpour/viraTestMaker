@@ -85,6 +85,21 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/semester/insert', [ SemesterController::class, 'insertSemester' ])->name('insertSemester');
         Route::post('/semester/update/{id}', [ SemesterController::class, 'updateSemester' ])->name('updateSemester');
         Route::get('/semester/activate/{id}', [ SemesterController::class, 'activateSemester' ])->name('activateSemester');
+
+
+
+
+
+    /**
+     * Semesters
+    */
+
+        Route::get('/assignees', [ SemesterController::class, 'index' ])->name('semesters');
+        Route::get('/assign/add', [ SemesterController::class, 'addSemester' ])->name('addSemester');
+        Route::get('/assign/edit/{id}', [ SemesterController::class, 'editSemester' ])->name('editSemester');
+        Route::get('/assign/delete/{id}', [ SemesterController::class, 'deleteSemester' ])->name('deleteClass');
+        Route::post('/assign/insert', [ SemesterController::class, 'insertSemester' ])->name('insertSemester');
+        Route::post('/assign/update/{id}', [ SemesterController::class, 'updateSemester' ])->name('updateSemester');
     });
 
     

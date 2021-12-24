@@ -25,6 +25,18 @@
                                                 <input type="text" class="form-control rtl datepickerTo" name="timeFinish" required autocomplete="off"
                                                 value="{{ timestampToJalali( $class->timeFinish ) }}"/>
                                             </div>
+                                            <div class="mb-3">
+                                                <label class="form-label required">استاد</label>
+                                                <select class="form-control rtl" name="teacher">
+                                                    <x-teacher-select-options :selected="$class->teacherID"/>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label required">درس</label>
+                                                <select class="form-control rtl" name="course">
+                                                    <x-course-select-options :selected="$class->courseID"/>
+                                                </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </fieldset>

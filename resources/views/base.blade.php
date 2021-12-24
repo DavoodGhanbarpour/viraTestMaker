@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <x-alert :type="'error'" :message="'asddasasd'"/>
+                <x-alert :type="'error'" :message="''"/>
 
 
                 <footer class="footer footer-transparent d-print-none">

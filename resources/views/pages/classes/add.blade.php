@@ -9,8 +9,8 @@
                             <div class="col-5">
                                 <fieldset class="form-fieldset">
                                     <div class="mb-3">
-                                        <label class="form-label required">عنوان</label>
-                                        <input type="text" class="form-control rtl" name="title" required autocomplete="off"
+                                        <label class="form-label">عنوان</label>
+                                        <input type="text" class="form-control rtl" name="title" autocomplete="off"
                                             value=""/>
                                     </div>
                                     <div class="mb-3">
@@ -26,6 +26,18 @@
                                                 value=""/>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label required">استاد</label>
+                                        <select class="form-control rtl" name="teacher">
+                                            <x-teacher-select-options/>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label required">درس</label>
+                                        <select class="form-control rtl" name="course">
+                                            <x-course-select-options/>
+                                        </select>
                                     </div>
                                 </fieldset>
                             </div>

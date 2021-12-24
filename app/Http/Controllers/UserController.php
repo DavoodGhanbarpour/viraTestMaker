@@ -83,7 +83,7 @@ class UserController extends Controller
             'name'          => $inputs['fullName'],
             'role'          => $inputs['role'] ?? 'STUDENT',
             'phoneNumber'   => $inputs['phoneNumber'] ,
-            'avatar'        => $path,
+            'avatar'        => $path ?? null,
         ];
        
 

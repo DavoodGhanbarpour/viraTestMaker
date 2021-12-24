@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Morilog\Jalali\Jalalian;
 
-class ClassController extends Controller
+class AssignClassController extends Controller
 {
     public function index()
     {
         $params = [
-            'classes'   => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
-            'teachers'  => $this->assocArrayOfTeachers(),
-            'courses'   => $this->assocArrayOfCourses(),
+            'classes' => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
         ];
 
         return view('pages.classes.index', $params);
@@ -46,10 +41,8 @@ class ClassController extends Controller
 
         $inputs         = $request->input(); 
         $dataToInsert   = [
-            'title'         => $inputs['title'] ?? 'بدون عنوان',
+            'title'         => $inputs['title'],
             'semesterID'    => $semesterID,
-            'teacherID'     => $inputs['teacher'],
-            'courseID'      => $inputs['course'],
             'code'          => $this->buildNextClassCode(),
             'timeStart'     => datepickerToTimestamp($inputs['timeStart']),
             'timeFinish'    => datepickerToTimestamp($inputs['timeFinish']),
@@ -72,8 +65,6 @@ class ClassController extends Controller
         
         $dataToUpdate   = [
             'title'         => $inputs['title'],
-            'teacherID'     => $inputs['teacher'],
-            'courseID'      => $inputs['course'],
             'timeStart'     => datepickerToTimestamp($inputs['timeStart']),
             'timeFinish'    => datepickerToTimestamp($inputs['timeFinish']),
         ];
@@ -127,32 +118,4 @@ class ClassController extends Controller
         else 
             return false;
     }
-
-
-    
-    private function assocArrayOfCourses()
-    {
-        $result         = [];
-        $courses        = DB::table('courses')->select('*')->where([ [ 'trash', '<>', trashed() ] ])->get()->toArray();
-        $result['']     = 'بدون عنوان';
-        foreach ($courses as $eachCourse)
-        {
-            $result[ $eachCourse->id ]   = $eachCourse->title;
-        }
-        return $result;
-    }
-
-    
-    private function assocArrayOfTeachers()
-    {
-        $result         = [];
-        $teachers       = DB::table('users')->select('*')->where([ [ 'trash', '<>', trashed() ] ,[ 'role', '=', 'TEACHER' ] ])->get()->toArray();
-        $result['']     = 'بدون عنوان';
-        foreach ($teachers as $eachCourse)
-        {
-            $result[ $eachCourse->id ]   = $eachCourse->name;
-        }
-        return $result;
-    }
-
 }
