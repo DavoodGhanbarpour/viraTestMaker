@@ -140,6 +140,16 @@
         return date('yy/m/d',$timestamp);
     }
 
+    function getFreeStorageAsGigabyte( $dir = '/' )
+    {
+        return round( ( disk_free_space($dir) ) / 1024 / 1024 / 1024, 2 );
+    } 
+    
+    function getFullStorageAsGigabyte( $dir = '/' )
+    {
+        return round( ( disk_total_space($dir) ) / 1024 / 1024 / 1024, 2 );
+    }
+
 
 
 
