@@ -132,36 +132,7 @@
               </div>
             </div>
           </div>
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header border-0">
-                <div class="card-title">حافظه موقت</div>
-              </div>
-              <div class="card-body">
-                <p class="mb-3">
-                  درحال استفاده 
-                  <strong>2GB </strong>
-                  از 
-                  <strong>8GB </strong>
-                </p>
-                <div class="progress progress-separated mb-3">
-                  <div class="progress-bar bg-primary" role="progressbar" style="width: 40%"></div>
-                </div>
-                <div class="row">
-                  <div class="col-auto d-flex align-items-center pe-2">
-                    <span class="legend me-2 bg-primary"></span>
-                    <span>درحال استفاده</span>
-                    <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">2GB</span>
-                  </div>
-                  <div class="col-auto d-flex align-items-center ps-2">
-                    <span class="legend me-2"></span>
-                    <span>آزاد</span>
-                    <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">6GB</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+     
         </div>
       </div>
 
