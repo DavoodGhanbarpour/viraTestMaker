@@ -42,7 +42,7 @@
                                     </td>
                                     <td >
                                         <div class="flex-fill">
-                                            <div class="font-weight-medium">{{ semesterActivationTitle( $eachSemester->isActive ) }}</div>
+                                            <div class="font-weight-medium">{{ trueFalseTitle( $eachSemester->isActive ) }}</div>
                                             <div class="text-muted">{{ semesterTypeTitles( $eachSemester->type ) }}</div>
                                         </div>
                                     </td>

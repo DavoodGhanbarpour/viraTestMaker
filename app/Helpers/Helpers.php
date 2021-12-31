@@ -96,6 +96,12 @@
     {
         $jalaliString   = toEngNumbers( $datePickerValue );
         return \Morilog\Jalali\CalendarUtils::createDatetimeFromFormat('Y/m/d', $jalaliString )->getTimestamp();
+    }   
+    
+    
+    function timestampTHours($timestamp)
+    {
+        return gmdate("H:i",$timestamp);   
     }
 
 
@@ -138,7 +144,7 @@
         return $array[ $input ];
     }
 
-    function semesterActivationTitle($input)
+    function trueFalseTitle($input)
     {
         $array  = [
             'true'     => 'فعال',

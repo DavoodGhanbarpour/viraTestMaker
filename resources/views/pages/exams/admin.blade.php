@@ -39,6 +39,62 @@
                                         </div>
                                     </td>
                                     <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ $eachExam->title }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ $eachExam->title }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div>{{ timestampToJalali( $eachExam->dateStart ) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div>{{ timestampToJalali( $eachExam->dateFinish ) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ timestampTHours($eachExam->timeStart - $eachExam->timeFinish) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ trueFalseTitle($eachExam->isReviewAllowed) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ trueFalseTitle($eachExam->isMoveAllowed) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ $eachExam->timesToTry }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="btn-list flex-nowrap">
                                             <a class="btn btn-info btn-sm" href="/category/edit/{{$eachExam->id}}">
                                                 ویرایش

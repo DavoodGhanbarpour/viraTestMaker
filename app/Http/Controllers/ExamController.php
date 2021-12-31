@@ -31,8 +31,9 @@ class ExamController extends Controller
     {
 
         $params = [
-            'exams'       => DB::table('Exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
-          
+            'exams'       => DB::table('exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'teachers'    => $this->assocArrayOfTeachers(),
+            'courses'     => $this->assocArrayOfCourses(),
         ];
         
         return view('pages.exams.admin', $params);
@@ -41,7 +42,7 @@ class ExamController extends Controller
     public function teacherExams()
     {
         $params = [
-            'exams'       => DB::table('Exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'exams'       => DB::table('exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
         ];
         
         return view('pages.exams.teacher', $params);
@@ -50,7 +51,7 @@ class ExamController extends Controller
     public function studentExams()
     {
         $params = [
-            'exams'       => DB::table('Exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'exams'       => DB::table('exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
         ];
         
         return view('pages.exams.student', $params);
@@ -69,7 +70,7 @@ class ExamController extends Controller
     {
         $params = [
             'categories'    => DB::table('categories')->select('*')->where([ ['trash', '<>', trashed() ] ])->get()->toArray(),
-            'course'        => DB::table('Exams')->select('*')->where([ ['trash', '<>', trashed() ], ['id', '=', $courseID ] ])->get()->first(),
+            'course'        => DB::table('exams')->select('*')->where([ ['trash', '<>', trashed() ], ['id', '=', $courseID ] ])->get()->first(),
         ];
         return view('pages.exams.edit', $params);
     }
@@ -92,7 +93,6 @@ class ExamController extends Controller
     public function insertExam( Request $request )
     {
         $inputs         = $request->input(); 
-        // varDumper($inputs);
         $dataToInsert   = [
             'title'             => $inputs['title'],
             'classID'           => $inputs['class'],
@@ -105,11 +105,10 @@ class ExamController extends Controller
             'isReviewAllowed'   => $inputs['random'] == 'TRUE' ? 'true' : 'false',
             'isMoveAllowed'     => $inputs['random'] == 'TRUE' ? 'true' : 'false',
         ];
-       varDumper($dataToInsert);
-        $insertedID = DB::table('Exams')->insertGetId($dataToInsert);
+        $insertedID = DB::table('exams')->insertGetId($dataToInsert);
 
         if( $insertedID )
-            return redirect('/Exams')->with('flashMessage', messageErrors( 200 ) );
+            return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
         else
             return back()->with('flashMessage',messageErrors( 402 ) );
     }
@@ -122,11 +121,38 @@ class ExamController extends Controller
             'categoryID'    => $inputs['category'] ?? 0,
         ];
        
-        $insertedID     = DB::table('Exams')->where('id',$courseID)->update($dataToUpdate);
+        $insertedID     = DB::table('exams')->where('id',$courseID)->update($dataToUpdate);
 
         if( $insertedID )
-            return redirect('/Exams')->with('flashMessage', messageErrors( 200 ) );
+            return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
         else
             return back()->with('flashMessage',messageErrors( 402 ) );
+    }
+
+
+
+    private function assocArrayOfCourses()
+    {
+        $result         = [];
+        $courses        = DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray();
+        $result['']     = 'بدون عنوان';
+        foreach ($courses as $eachCourse)
+        {
+            $result[ $eachCourse->id ]   = $eachCourse->title;
+        }
+        return $result;
+    }
+
+
+    private function assocArrayOfTeachers()
+    {
+        $result         = [];
+        $teachers       = DB::table('users')->select('*')->where([ [ 'trash', '<>', trashed() ] ,[ 'role', '=', 'TEACHER' ] ])->get()->toArray();
+        $result['']     = 'بدون عنوان';
+        foreach ($teachers as $eachCourse)
+        {
+            $result[ $eachCourse->id ]   = $eachCourse->name;
+        }
+        return $result;
     }
 }
