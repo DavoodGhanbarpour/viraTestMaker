@@ -101,14 +101,19 @@
 
     function timepickerToTimestamp($timepickerValue)
     {
-        $result         = 0; 
+        $minuts         = 0;
         $jalaliString   = toEngNumbers( $timepickerValue );
         $explodedString = explode( ':', $jalaliString);
+        if( $explodedString[0] == 0 && $explodedString[1] == 0 )
+        {
+            $explodedString[0] = 24;
+            $explodedString[1] = 0;
+        }
 
-        $result         += ( int ) $explodedString[0] * 60; 
-        $result         += $result * 60; 
-        $result         += ( int ) $explodedString[1] * 60; 
-        return $result;
+        $minuts         += ( int ) $explodedString[0] * 60; 
+        $minuts         += ( int ) $explodedString[1]; 
+
+        return $minuts * 60; 
     }
 
 
