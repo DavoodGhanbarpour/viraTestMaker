@@ -41,14 +41,15 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachExam->title }}</div>
+                                                <div class="font-weight-medium">{{ $eachExam->classTitle }}</div>
+                                                <div class="text-muted">{{ $eachExam->semesterTitle }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachExam->title }}</div>
+                                                <div class="font-weight-medium">{{ $eachExam->teacherName }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -56,6 +57,7 @@
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
                                                 <div>{{ timestampToJalali( $eachExam->dateStart ) }}</div>
+                                                <div class="text-muted">{{ timestampTHours( $eachExam->timeStart ) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -63,13 +65,14 @@
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
                                                 <div>{{ timestampToJalali( $eachExam->dateFinish ) }}</div>
+                                                <div class="text-muted">{{ timestampTHours( $eachExam->timeFinish ) }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ timestampTHours($eachExam->timeStart - $eachExam->timeFinish) }}</div>
+                                                <div class="font-weight-medium">{{ timestampTHours($eachExam->timeFinish - $eachExam->timeStart) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -96,10 +99,13 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-info btn-sm" href="/category/edit/{{$eachExam->id}}">
+                                            <a class="btn btn-warning btn-sm" href="{{route('addQuestions',['id'=>$eachExam->id])}}">
+                                                افزودن سوالات
+                                            </a>
+                                            <a class="btn btn-info btn-sm" href="{{route('editExam',['id'=>$eachExam->id])}}">
                                                 ویرایش
                                             </a>
-                                            <a class="btn btn-danger btn-sm" href="/category/delete/{{$eachExam->id}}">
+                                            <a class="btn btn-danger btn-sm" href="{{route('deleteExam',['id'=>$eachExam->id])}}">
                                                 حذف
                                             </a>
                                         </div>

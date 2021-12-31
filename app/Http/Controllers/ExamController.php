@@ -29,13 +29,18 @@ class ExamController extends Controller
     
     public function adminExams()
     {
-
-        $params = [
-            'exams'       => DB::table('exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
-            'teachers'    => $this->assocArrayOfTeachers(),
-            'courses'     => $this->assocArrayOfCourses(),
-        ];
-        
+        $params['exams'] =  DB::table('exams')->
+        join('classes', 'classes.id', '=', 'exams.classID')->
+        join('users', 'users.id', '=', 'classes.teacherID')->
+        join('courses', 'courses.id', '=', 'classes.courseID')->
+        join('semesters', 'semesters.id', '=', 'classes.semesterID')->
+        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle' ])->
+        where([ 
+            [ 'classes.trash', '<>', trashed() ], 
+            [ 'courses.trash', '<>', trashed() ], 
+            [ 'users.trash', '<>', trashed() ], 
+        ])->get()->toArray();
+            
         return view('pages.exams.admin', $params);
     }
 
@@ -61,17 +66,26 @@ class ExamController extends Controller
     public function addExam()
     {
         $params = [
-            'classes'     => DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'classes'     => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
         ];
         return view('pages.exams.add', $params);
     }
 
-    public function editExam( $courseID )
+    public function addQuestions( $examID )
     {
         $params = [
-            'categories'    => DB::table('categories')->select('*')->where([ ['trash', '<>', trashed() ] ])->get()->toArray(),
-            'course'        => DB::table('exams')->select('*')->where([ ['trash', '<>', trashed() ], ['id', '=', $courseID ] ])->get()->first(),
+            'classes'     => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
         ];
+        return view('pages.exams.addQuestions', $params);
+    }
+
+    public function editExam( $examID )
+    {
+        $params = [
+            'classes'       => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'exam'          => DB::table('exams')->select('*')->where([ ['trash', '<>', trashed()],['id', '=', $examID] ])->get()->first()
+        ];
+
         return view('pages.exams.edit', $params);
     }
 
@@ -90,13 +104,14 @@ class ExamController extends Controller
     }
 
 
-    public function insertExam( Request $request )
+    public function insertExam( Request $request ) 
     {
         $inputs         = $request->input(); 
         $dataToInsert   = [
             'title'             => $inputs['title'],
             'classID'           => $inputs['class'],
-            'score'             => $inputs['score'],
+            'score'             => toEngNumbers($inputs['score']),
+            'timesToTry'        => toEngNumbers($inputs['timesToTry']),
             'dateStart'         => datepickerToTimestamp($inputs['dateStart']),
             'dateFinish'        => datepickerToTimestamp($inputs['dateFinish']),
             'timeStart'         => timepickerToTimestamp($inputs['timeStart']),
@@ -105,6 +120,15 @@ class ExamController extends Controller
             'isReviewAllowed'   => $inputs['random'] == 'TRUE' ? 'true' : 'false',
             'isMoveAllowed'     => $inputs['random'] == 'TRUE' ? 'true' : 'false',
         ];
+
+        if( $this->isThisDayHasExam( $dataToInsert['dateStart'], $dataToInsert['dateFinish'], $dataToInsert['classID'] ) )
+            return back()->with('flashMessage', messageErrors( 410 ) );
+
+            
+        if( !$this->isStartIsLowerThanFinish( $dataToInsert['dateStart'], $dataToInsert['dateFinish'] ) || 
+            !$this->isStartIsLowerThanFinish( $dataToInsert['timeStart'], $dataToInsert['timeFinish'] ) )
+            return back()->with('flashMessage', messageErrors( 410 ) );
+            
         $insertedID = DB::table('exams')->insertGetId($dataToInsert);
 
         if( $insertedID )
@@ -113,15 +137,32 @@ class ExamController extends Controller
             return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
-    public function updateExam( Request $request, $courseID )
+    public function updateExam( Request $request, $examID )
     {
         $inputs         = $request->input(); 
         $dataToUpdate   = [
-            'title'         => $inputs['title'],
-            'categoryID'    => $inputs['category'] ?? 0,
+            'title'             => $inputs['title'],
+            'classID'           => $inputs['class'],
+            'score'             => toEngNumbers($inputs['score']),
+            'timesToTry'        => toEngNumbers($inputs['timesToTry']),
+            'dateStart'         => datepickerToTimestamp($inputs['dateStart']),
+            'dateFinish'        => datepickerToTimestamp($inputs['dateFinish']),
+            'timeStart'         => timepickerToTimestamp($inputs['timeStart']),
+            'timeFinish'        => timepickerToTimestamp($inputs['timeFinish']),
+            'isRandom'          => $inputs['random'] == 'TRUE' ? 'true' : 'false',
+            'isReviewAllowed'   => $inputs['random'] == 'TRUE' ? 'true' : 'false',
+            'isMoveAllowed'     => $inputs['random'] == 'TRUE' ? 'true' : 'false',
         ];
-       
-        $insertedID     = DB::table('exams')->where('id',$courseID)->update($dataToUpdate);
+
+        if( $this->isThisDayHasExam( $dataToUpdate['dateStart'], $dataToUpdate['dateFinish'], $dataToUpdate['classID'] ) )
+            return back()->with('flashMessage', messageErrors( 410 ) );
+
+            
+        if( !$this->isStartIsLowerThanFinish( $dataToUpdate['dateStart'], $dataToUpdate['dateFinish'] ) || 
+            !$this->isStartIsLowerThanFinish( $dataToUpdate['timeStart'], $dataToUpdate['timeFinish'] ) )
+            return back()->with('flashMessage', messageErrors( 410 ) );
+
+        $insertedID  = DB::table('exams')->where('id',$examID)->update($dataToUpdate);
 
         if( $insertedID )
             return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
@@ -130,29 +171,29 @@ class ExamController extends Controller
     }
 
 
-
-    private function assocArrayOfCourses()
+    private function isThisDayHasExam($dateStart,$dateFinish) : bool
     {
-        $result         = [];
-        $courses        = DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray();
-        $result['']     = 'بدون عنوان';
-        foreach ($courses as $eachCourse)
-        {
-            $result[ $eachCourse->id ]   = $eachCourse->title;
-        }
-        return $result;
+        $where = [ 
+            [ 'dateStart', '<=', $dateStart ],
+            [ 'dateFinish', '>=', $dateFinish ],
+            [ 'classID', '=', $dateFinish ],
+            [ 'trash', '<>', trashed() ],
+         ];
+
+        return DB::table('exams')->where($where)->exists() ;
     }
 
 
-    private function assocArrayOfTeachers()
+    
+    private function isStartIsLowerThanFinish( $start, $finish ) : bool
     {
-        $result         = [];
-        $teachers       = DB::table('users')->select('*')->where([ [ 'trash', '<>', trashed() ] ,[ 'role', '=', 'TEACHER' ] ])->get()->toArray();
-        $result['']     = 'بدون عنوان';
-        foreach ($teachers as $eachCourse)
-        {
-            $result[ $eachCourse->id ]   = $eachCourse->name;
-        }
-        return $result;
+        if( $start <= $finish )
+            return true;
+        else
+            return false;
     }
+
+
+    
+
 }

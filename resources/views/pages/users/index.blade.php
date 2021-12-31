@@ -21,7 +21,7 @@
                                             <span class="avatar me-2" style="background-image: url( {{ asset('storage'.$eachUser->avatar) }})"></span>
                                             <div class="flex-fill">
                                                 <div class="font-weight-medium">{{ $eachUser->name }}</div>
-                                                <div class="text-muted"><a href="#" class="text-reset">{{ $eachUser->username }}</a></div>
+                                                <div class="text-muted">{{ $eachUser->username }}</div>
                                             </div>
                                         </div>
                                     </td>
