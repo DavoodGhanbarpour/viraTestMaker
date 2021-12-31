@@ -122,7 +122,7 @@ class ExamController extends Controller
         ];
 
         if( $this->isThisDayHasExam( $dataToInsert['dateStart'], $dataToInsert['dateFinish'], $dataToInsert['classID'] ) )
-            return back()->with('flashMessage', messageErrors( 410 ) );
+            return back()->with('flashMessage', messageErrors( 409 ) );
 
             
         if( !$this->isStartIsLowerThanFinish( $dataToInsert['dateStart'], $dataToInsert['dateFinish'] ) || 
@@ -137,7 +137,7 @@ class ExamController extends Controller
             return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
-    public function updateExam( Request $request, $examID )
+    public function updateExam( $examID, Request $request )
     {
         $inputs         = $request->input(); 
         $dataToUpdate   = [
@@ -154,8 +154,8 @@ class ExamController extends Controller
             'isMoveAllowed'     => $inputs['random'] == 'TRUE' ? 'true' : 'false',
         ];
 
-        if( $this->isThisDayHasExam( $dataToUpdate['dateStart'], $dataToUpdate['dateFinish'], $dataToUpdate['classID'] ) )
-            return back()->with('flashMessage', messageErrors( 410 ) );
+        if( $this->isThisDayHasExam( $dataToUpdate['dateStart'], $dataToUpdate['dateFinish'], $dataToUpdate['classID'], $examID ) )
+            return back()->with('flashMessage', messageErrors( 409 ) );
 
             
         if( !$this->isStartIsLowerThanFinish( $dataToUpdate['dateStart'], $dataToUpdate['dateFinish'] ) || 
@@ -171,16 +171,17 @@ class ExamController extends Controller
     }
 
 
-    private function isThisDayHasExam($dateStart,$dateFinish) : bool
+    private function isThisDayHasExam($dateStart,$dateFinish,$classID,$rowID = 0) : bool
     {
         $where = [ 
             [ 'dateStart', '<=', $dateStart ],
             [ 'dateFinish', '>=', $dateFinish ],
-            [ 'classID', '=', $dateFinish ],
+            [ 'classID', '=', $classID ],
+            [ 'id', '<>', $rowID ],
             [ 'trash', '<>', trashed() ],
          ];
 
-        return DB::table('exams')->where($where)->exists() ;
+        return DB::table('exams')->where($where)->exists();
     }
 
 
