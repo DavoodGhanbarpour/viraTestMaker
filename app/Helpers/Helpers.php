@@ -99,6 +99,19 @@
     }
 
 
+    function timepickerToTimestamp($timepickerValue)
+    {
+        $result         = 0; 
+        $jalaliString   = toEngNumbers( $timepickerValue );
+        $explodedString = explode( ':', $jalaliString);
+
+        $result         += ( int ) $explodedString[0] * 60; 
+        $result         += $result * 60; 
+        $result         += ( int ) $explodedString[1] * 60; 
+        return $result;
+    }
+
+
     function timestampToJalali($timestamp)
     {
         return jdate($timestamp)->format('Y/m/d');

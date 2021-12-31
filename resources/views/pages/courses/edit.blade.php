@@ -18,7 +18,6 @@
                                     <select class="form-control rtl" name="category" id="parentCombo" required>
                                         <option value="0">بدون دسته بندی</option>
                                         @foreach ($categories as $eachCategory)
-                                            
                                             @php
                                                 $selected = ( $course->categoryID == $eachCategory->id ) ? 'selected' : '' ;
                                             @endphp

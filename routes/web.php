@@ -8,6 +8,7 @@ use App\Http\Controllers\ClassController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\AssignClassController;
+use App\Http\Controllers\ExamController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -67,13 +68,27 @@ Route::middleware(['auth'])->group(function () {
      * Classes
      */
 
-        Route::get('/classes', [ ClassController::class, 'index' ])->name('categories');
+        Route::get('/classes', [ ClassController::class, 'index' ])->name('classes');
         Route::get('/class/add', [ ClassController::class, 'addClass' ])->name('addClass');
         Route::get('/class/edit/{id}', [ ClassController::class, 'editClass' ])->name('editClass');
         Route::get('/class/delete/{id}', [ ClassController::class, 'deleteClass' ])->name('deleteClass');
         Route::post('/class/insert', [ ClassController::class, 'insertClass' ])->name('insertClass');
         Route::post('/class/update/{id}', [ ClassController::class, 'updateClass' ])->name('updateClass');
     
+
+         
+    /**
+     * Classes
+     */
+
+        Route::get('/exams', [ ExamController::class, 'index' ])->name('exams');
+        Route::get('/exam/add', [ ExamController::class, 'addExam' ])->name('addExam');
+        Route::get('/exam/edit/{id}', [ ExamController::class, 'editExam' ])->name('editExam');
+        Route::get('/exam/delete/{id}', [ ExamController::class, 'deleteExam' ])->name('deleteExam');
+        Route::post('/exam/insert', [ ExamController::class, 'insertExam' ])->name('insertExam');
+        Route::post('/exam/update/{id}', [ ExamController::class, 'updateClass' ])->name('updateExam');
+
+
 
     /**
      * Semesters
