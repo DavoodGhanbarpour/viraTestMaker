@@ -14,7 +14,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        {{-- <div class="table-responsive">
                             <table class="table table-vcenter table-mobile-md card-table">
                                 <thead>
                                 <tr>
@@ -35,11 +35,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="d-flex py-1 align-items-center">
-                                                <div class="">
-                                                    <input type="text" class="form-control">
-                                                </div>
-                                            </div>
+                                            <input type="text" class="form-control">
                                         </td>
                                         <td>
                                             <div class="d-flex py-1 align-items-center">
@@ -78,7 +74,173 @@
                                 @endforeach
                                 </tbody>
                             </table>
+                        </div> --}}
+                        <div class="my-2 row fix-header">
+                            <div class="col-1 text-center">
+                                <label for="">ردیف</label>
+                            </div>
+                            <div class="col-3 text-center">
+                                <label for="">عنوان</label>
+                            </div>
+                            <div class="col-1 text-center">
+                                <label for="">نمره</label>
+                            </div>
+                            <div class="col-3 text-center">
+                                <label for="">نوع سوال</label>
+                            </div>
+                            <div class="col-3 text-center">
+                                <label for="">گزینه ها</label>
+                            </div>
+                            <div class="col-1 text-center">
+                                <label for="">اقدامات</label>
+                            </div>
                         </div>
+
+                        <div class="row px-1">
+                            <div class="col-1 text-center">
+                                ۱
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-1">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-3">
+                                <select class="form-control">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="row pb-2">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <input type="radio" name="" id="">
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row pb-2">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <input type="radio" name="" id="">
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row pb-2">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <input type="radio" name="" id="">
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row pb-2">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <input type="radio" name="" id="">
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-1 text-center">
+                                <a class="btn btn-danger">
+                                    حذف
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="row px-1">
+                            <div class="col-1 text-center">
+                               ۲
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-1">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-3">
+                                <select class="form-control">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="row pb-2">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <input type="radio" name="" id="">
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row pb-2">
+                                    <div class="col-2 d-flex align-items-center justify-content-center">
+                                        <input type="radio" name="" id="">
+                                    </div>
+                                    <div class="col-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-1 text-center">
+                                <a class="btn btn-danger">
+                                    حذف
+                                </a>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="row px-1">
+                            <div class="col-1 text-center">
+                               ۳
+                            </div>
+                            <div class="col-3">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-1">
+                                <input type="text" class="form-control">
+                            </div>
+                            <div class="col-3">
+                                <select class="form-control">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="row">
+                                    <div class="col-2">
+                                        &nbsp;
+                                    </div>
+                                    <div class="col-10">
+                                        <textarea class="form-control" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-1 text-center">
+                                <a class="btn btn-danger">
+                                    حذف
+                                </a>
+                            </div>
+
+                        </div>
+
                         <div class="d-flex justify-content-end">
                             <div class="form-footer">
                                 <x-cancel-button/>
