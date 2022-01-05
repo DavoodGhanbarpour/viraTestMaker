@@ -75,5 +75,6 @@
 <script src="{{ asset('assets/js/libraries/jquery.js') }}"></script>
 <script src="{{ asset('assets/js/libraries/persian-datepicker.min.js') }}"></script>
 <script src="{{ asset('assets/js/libraries/persian-date.min.js') }}"></script>
+<script src="{{ asset('assets/js/libraries/repeater.js') }}"></script>
 
 @yield('scripts')

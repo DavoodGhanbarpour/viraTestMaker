@@ -38,14 +38,14 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div>{{ $courses[ $eachClass->courseID ] }}</div>
+                                                <div>{{ $courses[ $eachClass->courseID ] ?? '' }}</div>
                                             </div>
                                         </div>
                                     </td>  
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div>{{ $teachers[ $eachClass->teacherID ] }}</div>
+                                                <div>{{ $teachers[ $eachClass->teacherID ] ?? '' }}</div>
                                             </div>
                                         </div>
                                     </td>  

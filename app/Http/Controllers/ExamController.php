@@ -71,8 +71,18 @@ class ExamController extends Controller
         return view('pages.exams.add', $params);
     }
 
-    public function addQuestions( $examID )
+    public function addQuestions($examID)
     {
+        $params = [
+            'classes'       => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'examID'        => $examID,
+        ];
+        return view('pages.exams.addQuestions', $params);
+    }
+    
+    public function insertQuestions( Request $request )
+    {
+        varDumper( $request->input());
         $params = [
             'classes'     => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
         ];
