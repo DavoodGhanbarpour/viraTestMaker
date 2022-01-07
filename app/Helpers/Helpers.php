@@ -46,6 +46,19 @@
     }
 
 
+    function questionTypes()
+    {
+        $array  = [
+            'multiOption' => 'چهار گزینه ای',
+            'trueFalse'   => 'صحیح/غلط',
+            'description' => 'تشریحی',
+        ];
+
+        return $array;
+    }
+
+
+
     function coursesLevelTitle( $level = '' )
     {
         $array  = [
@@ -70,6 +83,17 @@
         return str_replace($persian, $english, $input);
     }
 
+
+    function extractAnswersOptionsFromArray( $array )
+    {
+        $i      = 0;
+        $result = [];
+        foreach ($array as $key => $value) 
+            if ( preg_match('/answer/',$key) ) 
+                $result[$i][$key] = $value;
+
+        return $result;
+    }
 
     function varDumper( ...$data )
     {

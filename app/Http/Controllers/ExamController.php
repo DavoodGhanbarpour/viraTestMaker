@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\Continue_;
 
 class ExamController extends Controller
 {
@@ -39,6 +40,7 @@ class ExamController extends Controller
             [ 'classes.trash', '<>', trashed() ], 
             [ 'courses.trash', '<>', trashed() ], 
             [ 'users.trash', '<>', trashed() ], 
+            [ 'exams.trash', '<>', trashed() ], 
         ])->get()->toArray();
             
         return view('pages.exams.admin', $params);
@@ -73,20 +75,74 @@ class ExamController extends Controller
 
     public function addQuestions($examID)
     {
-        $params = [
-            'classes'       => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+        $groupedQuestinos   = [];
+        $questions          = DB::table('questions')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
+        join('exams', 'exams.id', '=', 'questions.examID')->
+        select([ 'questions.*','questions.title as questionsTitle', 'questions.id as masterID', 'questions_detail.title as optionTitle', 'questions.examID', 'questions_detail.questionID','questions_detail.id as slaveID' ])->
+        where([ 
+            [ 'exams.id', '=', $examID ], 
+            [ 'questions.trash', '<>', trashed() ], 
+            [ 'questions_detail.trash', '<>', trashed() ], 
+        ])->get()->toArray();
+        
+
+        foreach ($questions as $value) 
+        {
+            $groupedQuestinos[ $value->questionID ]['title']            = $value->questionsTitle;
+            $groupedQuestinos[ $value->questionID ]['score']            = $value->score;
+            $groupedQuestinos[ $value->questionID ]['questionType']     = $value->type;
+            $groupedQuestinos[ $value->questionID ]['slaves'][] = $value;
+        }
+
+        $params     = [
+            'questions'     => $groupedQuestinos,
             'examID'        => $examID,
         ];
         return view('pages.exams.addQuestions', $params);
     }
     
-    public function insertQuestions( Request $request )
+    public function insertQuestions( $examID, Request $request )
     {
-        varDumper( $request->input());
-        $params = [
-            'classes'     => DB::table('classes')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
-        ];
-        return view('pages.exams.addQuestions', $params);
+        $inputs             = $request->input(); 
+        $questionsMaster    = [];
+        $questionsSlave     = [];
+
+        foreach ($inputs['examQuestions'] as $value) 
+        {
+            $questionsMaster    = [
+                'examID'        => $examID,
+                'score'         => $value['score'],
+                'title'         => $value['title'],
+                'type'          => $value['questionType'],
+            ];  
+            $insertedID     = DB::table('questions')->insertGetId($questionsMaster);    
+            if( !$insertedID )
+                continue;
+            $answersAsArray = ( extractAnswersOptionsFromArray($value) );
+            foreach ( reset( $answersAsArray ) as $inputName => $title) 
+            {
+                $isCorrectAnswer = 'false';
+                if( isset( $value['correctAnswer'] ) )
+                {
+                    $isCorrectAnswer    = filter_var($inputName, FILTER_SANITIZE_NUMBER_INT) == $value['correctAnswer'];
+                    $isCorrectAnswer    ? 'true' : 'false';
+                }
+                $questionsSlave[]   = [
+                    'questionID'    => $insertedID,
+                    'title'         => $title,
+                    'correctAnswer' => $isCorrectAnswer, 
+                ];
+            }
+
+        }
+
+        $resultOfMultiInsert    = DB::table('questions_detail')->insert($questionsSlave);
+        // varDumper('asdsadasd');
+        if( $resultOfMultiInsert )
+            return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
+        else
+            return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
     public function editExam( $examID )
