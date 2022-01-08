@@ -35,11 +35,11 @@ class CategoryController extends Controller
 
     public function insertCategory(Request $request)
     {
-        $inputs         = $request->input(); 
+        $inputs         = $request->input();
         $dataToInsert   = [
             'title'         => $inputs['title'],
         ];
-       
+
         $insertedID = DB::table('categories')->insertGetId($dataToInsert);
 
         if( $insertedID )
@@ -49,14 +49,14 @@ class CategoryController extends Controller
     }
 
 
-    
+
     public function updateCategory( Request $request, $categoryID )
     {
-        $inputs         = $request->input(); 
+        $inputs         = $request->input();
         $dataToUpdate   = [
             'title'         => $inputs['title'],
         ];
-       
+
         $insertedID     = DB::table('categories')->where('id',$categoryID)->update($dataToUpdate);
 
         if( $insertedID )
@@ -65,7 +65,7 @@ class CategoryController extends Controller
             return back()->with('flashMessage',messageErrors( 402 ) );
     }
 
-        
+
     public function deleteCategory( $categoryID )
     {
         $affected = DB::table('categories')

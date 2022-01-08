@@ -17,7 +17,9 @@ class CategoryControllerTest extends TestCase
      */
     public function test_indexMethod_MustLoad_pages_categories_index_View()
     {
-        $this->markTestIncomplete();
+        $this->withoutMiddleware([Authenticate::class, GodUsers::class]);
+        $this->expectViewFiles('pages.categories.index');
+        $this->get('/categories');
     }
 
     /**
