@@ -79,7 +79,7 @@ class ExamController extends Controller
         $questions          = DB::table('questions')->
         join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
         join('exams', 'exams.id', '=', 'questions.examID')->
-        select([ 'questions.*','questions.title as questionsTitle', 'questions.id as masterID', 'questions_detail.title as optionTitle', 'questions.examID', 'questions_detail.questionID','questions_detail.id as slaveID' ])->
+        select([ 'questions.*','questions.title as questionsTitle', 'questions.id as masterID', 'questions_detail.correctAnswer', 'questions_detail.title as optionTitle', 'questions.examID', 'questions_detail.questionID','questions_detail.id as slaveID' ])->
         where([ 
             [ 'exams.id', '=', $examID ], 
             [ 'questions.trash', '<>', trashed() ], 
@@ -89,17 +89,52 @@ class ExamController extends Controller
 
         foreach ($questions as $value) 
         {
+            $groupedQuestinos[ $value->questionID ]['id']               = $value->id;
             $groupedQuestinos[ $value->questionID ]['title']            = $value->questionsTitle;
             $groupedQuestinos[ $value->questionID ]['score']            = $value->score;
             $groupedQuestinos[ $value->questionID ]['questionType']     = $value->type;
-            $groupedQuestinos[ $value->questionID ]['slaves'][] = $value;
-        }
 
+            if(  $value->type == 'multiOption' )
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption']    = $this->buildFakeOptionData('multiOption');
+
+            if(  $value->type == 'trueFalse' )
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase'][]    = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase']      = $this->buildFakeOptionData('trueFalse');
+
+            if(  $value->type == 'description' )
+                $groupedQuestinos[ $value->questionID ]['slavesDescription'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesDescription']    = $this->buildFakeOptionData('description');
+        }
+    
         $params     = [
             'questions'     => $groupedQuestinos,
             'examID'        => $examID,
         ];
         return view('pages.exams.addQuestions', $params);
+    }
+
+    private function buildFakeOptionData($inp)
+    {
+        $options = [];
+        switch ($inp) 
+        {
+            case 'multiOption':
+                $options = [ [ 'optionTitle' => '', 'correctAnswer' => 'false' ],[ 'optionTitle' => '', 'correctAnswer' => 'false' ],[ 'optionTitle' => '', 'correctAnswer' => 'false' ],[ 'optionTitle' => '', 'correctAnswer' => 'false' ] ];
+                break;
+
+            case 'trueFalse':
+                $options = [ [ 'optionTitle' => '', 'correctAnswer' => 'false' ],[ 'optionTitle' => '', 'correctAnswer' => 'false' ] ];
+                break;
+
+            case 'description':
+                $options = [ [ 'optionTitle' => ''] ];
+                break;
+        }
+        return json_decode( json_encode($options) );
     }
     
     public function insertQuestions( $examID, Request $request )
@@ -110,12 +145,23 @@ class ExamController extends Controller
 
         foreach ($inputs['examQuestions'] as $value) 
         {
+            if( $value['lastQuestionID'] )
+            {
+                DB::table('questions')
+                ->where('id', '=' ,$value['lastQuestionID'])
+                ->update([ 'trash' => trashed() ]);
+
+                DB::table('questions_detail')
+                ->where('questionID', '=' ,$value['lastQuestionID'])
+                ->update([ 'trash' => trashed() ]);
+            }
             $questionsMaster    = [
                 'examID'        => $examID,
                 'score'         => $value['score'],
                 'title'         => $value['title'],
                 'type'          => $value['questionType'],
             ];  
+            
             $insertedID     = DB::table('questions')->insertGetId($questionsMaster);    
             if( !$insertedID )
                 continue;
@@ -126,7 +172,7 @@ class ExamController extends Controller
                 if( isset( $value['correctAnswer'] ) )
                 {
                     $isCorrectAnswer    = filter_var($inputName, FILTER_SANITIZE_NUMBER_INT) == $value['correctAnswer'];
-                    $isCorrectAnswer    ? 'true' : 'false';
+                    $isCorrectAnswer    = $isCorrectAnswer    ? 'true' : 'false';
                 }
                 $questionsSlave[]   = [
                     'questionID'    => $insertedID,
@@ -136,9 +182,9 @@ class ExamController extends Controller
             }
 
         }
-
+        // varDumper($questionsSlave);
         $resultOfMultiInsert    = DB::table('questions_detail')->insert($questionsSlave);
-        // varDumper('asdsadasd');
+   
         if( $resultOfMultiInsert )
             return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
         else
