@@ -6,14 +6,15 @@ use Illuminate\View\Component;
 
 class RoleSelectOptions extends Component
 {
+    public $role;
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($role)
     {
-        //
+        $this->role = $role;
     }
 
     /**

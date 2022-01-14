@@ -32,7 +32,7 @@
                                     <div class="mb-3">
                                         <label class="form-label required">سمت</label>
                                         <select class="form-control rtl" name="role">
-                                            <x-role-select-options/>
+                                            <x-role-select-options :role="$role??0"/>
                                         </select>
                                     </div>
 

@@ -50,9 +50,25 @@ class CourseController extends Controller
 
     public function studentCourses()
     {
+        $courses =  DB::table('classes')->
+        join('users', 'users.id', '=', 'classes.teacherID')->
+        join('courses', 'courses.id', '=', 'classes.courseID')->
+        join('semesters', 'semesters.id', '=', 'classes.semesterID')->
+        join('assignees', 'assignees.classID', '=', 'classes.id')->
+        join('categories', 'categories.id', '=', 'courses.categoryID')->
+        select([ 'semesters.title as semesterTitle', 'courses.title as courseTitle', 'courses.title as categoryTitle', 'classes.timeStart','classes.timeFinish', 'users.name as teacherName', 'classes.id as classID'   ])->
+        where([ 
+            [ 'classes.trash', '<>', trashed() ], 
+            [ 'courses.trash', '<>', trashed() ], 
+            [ 'users.trash', '<>', trashed() ], 
+            [ 'semesters.trash', '<>', trashed() ],
+            [ 'assignees.trash', '<>', trashed() ],
+            [ 'assignees.studentID', '=', Auth::user()->id ],
+        ])->groupby('assignees.classID')->get()->toArray();
+        // varDumper($courses);
+
         $params = [
-            'courses'       => DB::table('courses')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
-            'categories'    => $this->assocArrayOfCategories(),
+            'courses'       => $courses,
         ];
         
         return view('pages.courses.student', $params);

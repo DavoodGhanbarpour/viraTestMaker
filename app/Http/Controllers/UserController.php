@@ -26,7 +26,7 @@ class UserController extends Controller
     public function users()
     {
         $params     = [
-            'users' => DB::table('users')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
+            'users' => DB::table('users')->select('*')->where([ ['trash', '<>', trashed()] ])->get()->toArray(),
         ];
         return view('pages.users.index', $params);
     }
@@ -79,6 +79,7 @@ class UserController extends Controller
                 return back()->with('flashMessage',messageErrors( 406 ) );
 
         $dataToUpdate   = [
+            'username'      => $inputs['username'],
             'email'         => $inputs['email'],
             'name'          => $inputs['fullName'],
             'role'          => $inputs['role'] ?? 'STUDENT',
@@ -96,7 +97,7 @@ class UserController extends Controller
 
 
         if( $insertedID )
-            return back()->with('flashMessage', messageErrors( 200 ) );
+            return redirect('/users')->with('flashMessage', messageErrors( 200 ) );
         else
             return back()->with('flashMessage',messageErrors( 402 ) );
     } 
@@ -113,6 +114,7 @@ class UserController extends Controller
                 return back()->with('flashMessage',messageErrors( 406 ) );
 
         $dataToUpdate   = [
+            'username'      => $inputs['username'],
             'email'         => $inputs['email'],
             'name'          => $inputs['fullName'],
             'phoneNumber'   => $inputs['phoneNumber'] ,

@@ -27,6 +27,85 @@ class ExamController extends Controller
                 break;
         }
     }
+
+    private function getExamDetail($examID)
+    {
+        return DB::table('exams')->
+        select([ 'exams.*' ])->
+        where([ 
+            [ 'exams.id', '=', $examID ],
+            [ 'exams.trash', '<>', trashed() ],
+        ])->get()->first();
+        
+    }
+
+    private function getQuestionsByExamID( $examID, $isRandom )
+    {
+        $questionsMasterDetails = DB::table('questions');
+
+        if( $isRandom == 'true' )
+            $questionsMasterDetails = $questionsMasterDetails->inRandomOrder();
+
+        $questionDetail = $questionsMasterDetails->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->select('questions.*')->
+        where([ 
+            [ 'questions.examID', '=', $examID ],
+            [ 'questions.trash', '<>', trashed() ],
+            [ 'questions_detail.trash', '<>', trashed() ],
+        ])->get()->first();
+
+        // ---------------------------------------------------------------------------------------- //
+        
+        $questionsSlaveDetails = DB::table('questions_detail');
+
+        if( $isRandom == 'true' )
+            $questionsSlaveDetails = $questionsSlaveDetails->inRandomOrder();
+
+        $questionSlaveDetail = $questionsSlaveDetails->select('*')->
+        where([ 
+            [ 'questions_detail.questionID', '=', $questionDetail->id ],
+            [ 'questions_detail.trash', '<>', trashed() ],
+        ])->get()->toArray();
+
+
+        return [ 'slaves' => $questionSlaveDetail, 'master' => $questionDetail ];
+    }
+
+    public function attendance($examID)
+    {
+        $examDetails        = $this->getExamDetail($examID);
+
+        $questionDetails    = $this->getQuestionsByExamID($examID, $examDetails->isRandom); 
+      
+
+
+        $params = [
+            'questionsDetails' => $questionDetails,
+            'examDetails'       => $examDetails,
+        ];
+
+        return view('pages.exams.attendance', $params);
+    }
+
+
+    public function examsOfAClass($classID)
+    {
+        $params['exams'] =  DB::table('exams')->
+        join('classes', 'classes.id', '=', 'exams.classID')->
+        join('users', 'users.id', '=', 'classes.teacherID')->
+        join('courses', 'courses.id', '=', 'classes.courseID')->
+        join('semesters', 'semesters.id', '=', 'classes.semesterID')->
+        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle' ])->
+        where([ 
+            [ 'classes.id', '=', $classID ], 
+            [ 'classes.trash', '<>', trashed() ], 
+            [ 'courses.trash', '<>', trashed() ], 
+            [ 'users.trash', '<>', trashed() ], 
+            [ 'exams.trash', '<>', trashed() ], 
+        ])->get()->toArray();
+
+        return view('pages.exams.general', $params);
+    }
     
     public function adminExams()
     {

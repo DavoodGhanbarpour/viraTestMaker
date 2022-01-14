@@ -39,9 +39,15 @@ Route::middleware(['auth'])->group(function () {
 
 
     /**
-     * Courses
+     * General Parts
      */
     Route::get('/courses', [ CourseController::class, 'index' ])->name('courses');
+    Route::get('/exams/{id}', [ ExamController::class, 'examsOfAClass' ])->name('examsOfACourse');
+    Route::get('/attendance/{examID}', [ ExamController::class, 'attendance' ])->name('attendance');
+    Route::get('/attendance/{examID}/{questionID}', [ ExamController::class, 'attendance' ])->name('attendanceWithQuestion');
+    Route::get('/attendance/answer/{examID}/{questionID}', [ ExamController::class, 'attendance' ])->name('answerExam');
+
+
     Route::middleware(['godUsers'])->group(function () {
         Route::get('/course/add', [ CourseController::class, 'addCourse' ])->name('addCourse');
         Route::get('/course/edit/{id}', [ CourseController::class, 'editCourse' ])->name('editCourse');
