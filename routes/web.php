@@ -28,14 +28,14 @@ Route::post('/authenticate', [ AthenticationController::class, 'authenticate' ])
 
 Route::middleware(['auth'])->group(function () {
 
-    
+
     /**
      * Main
      */
     Route::get('/dashboard', [ DashboardController::class, 'index' ])->name('dashboard');
     Route::get('/profile', [ UserController::class, 'profile' ])->name('profile');
     Route::post('/profile/update', [ UserController::class, 'updateProfile' ])->name('updateProfile');
-   
+
 
 
     /**
@@ -69,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/category/update/{id}', [ CategoryController::class, 'updateCategory' ])->name('updateCategory');
 
 
-    
+
     /**
      * Classes
      */
@@ -80,9 +80,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/class/delete/{id}', [ ClassController::class, 'deleteClass' ])->name('deleteClass');
         Route::post('/class/insert', [ ClassController::class, 'insertClass' ])->name('insertClass');
         Route::post('/class/update/{id}', [ ClassController::class, 'updateClass' ])->name('updateClass');
-    
 
-         
+
+
     /**
      * Exams
      */
@@ -124,9 +124,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/assignees/class/{classID}', [ AssignClassController::class, 'classAssignees' ])->name('classAssignees');
     });
 
-    
+
     /**
-     * Admin 
+     * Admin
      */
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [ UserController::class, 'users' ])->name('users');
@@ -135,7 +135,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/user/update/{id}', [ UserController::class, 'updateUser' ])->name('updateUser');
     });
 
-   
 
-    
+
+
 });
