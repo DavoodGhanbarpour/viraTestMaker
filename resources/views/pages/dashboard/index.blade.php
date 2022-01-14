@@ -49,6 +49,41 @@
               </div>
             </div>
           </div>
+     
+        </div>
+      </div>
+      <div class="col-sm-6">
+        <div class="row  row-cards">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header border-0">
+                <div class="card-title">فضای ذخیره سازی</div>
+              </div>
+              <div class="card-body">
+                <p class="mb-3">
+                  درحال استفاده 
+                  <strong>{{ $systemStatics['usedDisk'] }}GB</strong>
+                  از 
+                  <strong>{{ $systemStatics['totalDisk'] }}GB</strong>
+                </p>
+                <div class="progress progress-separated mb-3">
+                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{$systemStatics['usedPercent']}}%"></div>
+                </div>
+                <div class="row">
+                  <div class="col-auto d-flex align-items-center pe-2">
+                    <span class="legend me-2 bg-warning"></span>
+                    <span>درحال استفاده</span>
+                    <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">{{ $systemStatics['usedDisk'] }}GB</span>
+                  </div>
+                  <div class="col-auto d-flex align-items-center ps-2">
+                    <span class="legend me-2"></span>
+                    <span>آزاد</span>
+                    <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">{{ $systemStatics['freeDisk'] }}GB</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
@@ -98,41 +133,6 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="col-sm-6">
-        <div class="row  row-cards">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header border-0">
-                <div class="card-title">فضای ذخیره سازی</div>
-              </div>
-              <div class="card-body">
-                <p class="mb-3">
-                  درحال استفاده 
-                  <strong>{{ $systemStatics['usedDisk'] }}GB</strong>
-                  از 
-                  <strong>{{ $systemStatics['totalDisk'] }}GB</strong>
-                </p>
-                <div class="progress progress-separated mb-3">
-                  <div class="progress-bar bg-warning" role="progressbar" style="width: {{$systemStatics['usedPercent']}}%"></div>
-                </div>
-                <div class="row">
-                  <div class="col-auto d-flex align-items-center pe-2">
-                    <span class="legend me-2 bg-warning"></span>
-                    <span>درحال استفاده</span>
-                    <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">{{ $systemStatics['usedDisk'] }}GB</span>
-                  </div>
-                  <div class="col-auto d-flex align-items-center ps-2">
-                    <span class="legend me-2"></span>
-                    <span>آزاد</span>
-                    <span class="d-none d-md-inline d-lg-none d-xxl-inline ms-2 text-muted">{{ $systemStatics['freeDisk'] }}GB</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-     
         </div>
       </div>
 
