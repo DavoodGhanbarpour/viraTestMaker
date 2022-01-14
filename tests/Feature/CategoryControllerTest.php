@@ -4,13 +4,15 @@ namespace Tests\Feature;
 
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\GodUsers;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class CategoryControllerTest extends TestCase
 {
-    use ViewAssertions;
+    use ViewAssertions, RefreshDatabase;
 
     /**
      * index tests
@@ -20,6 +22,29 @@ class CategoryControllerTest extends TestCase
         $this->withoutMiddleware([Authenticate::class, GodUsers::class]);
         $this->expectViewFiles('pages.categories.index');
         $this->get('/categories');
+    }
+
+
+    public function test_indexMethod_MustPass_categories_arrayToView()
+    {
+        //
+        //$this->withoutExceptionHandling();
+        // $this->withoutMiddleware([Authenticate::class, GodUsers::class]);
+        $user = User::factory()->create();
+        Auth::loginUsingId(1);
+        $response = $this->get('/categories');
+
+        //$response->dumpHeaders();
+
+        //$response->dumpSession();
+
+        //$response->dump();
+
+
+
+
+        $response->assertViewHas( 'categories');
+        $response->assertStatus(200);
     }
 
     /**
