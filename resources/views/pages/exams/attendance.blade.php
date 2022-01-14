@@ -13,18 +13,28 @@
                                         <label class="form-label">{{ $questionsDetails['master']->title }}</label> 
                                     </div>
                                     <hr>
-                                    @foreach ($questionsDetails['slaves'] as $eachKey => $eachItem)
+                                    @if ( count( $questionsDetails['slaves'] ) > 1 )
+                                        @foreach ($questionsDetails['slaves'] as $eachKey => $eachItem)
+                                            <div class="mb-3">
+                                                <div class="row">
+                                                    <div class="col-1">
+                                                        <input type="radio" name="correctAnswer" id="correctAnswer{{$eachKey+1}}">
+                                                    </div>
+                                                    <div class="col-11">
+                                                        <label class="form-label" for="correctAnswer{{$eachKey+1}}">{{$eachItem->title}}</label>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        @endforeach
+                                    @else
                                         <div class="mb-3">
                                             <div class="row">
-                                                <div class="col-1">
-                                                    <input type="radio" name="correctAnswer" id="correctAnswer{{$eachKey+1}}">
-                                                </div>
-                                                <div class="col-11">
-                                                    <label class="form-label" for="correctAnswer{{$eachKey+1}}">{{$eachItem->title}}</label>
+                                                <div class="col-12">
+                                                    <textarea class="form-control" name="correctAnswer" cols="30" rows="10"></textarea>
                                                 </div>
                                             </div>
                                         </div> 
-                                    @endforeach
+                                    @endif
                             
                                     {{-- <div class="mb-3">
                                         <div class="row">
