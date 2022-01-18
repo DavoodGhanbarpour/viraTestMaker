@@ -313,11 +313,11 @@ class ExamController extends Controller
     public function attendance($examID)
     {
         $examDetails        = $this->getExamDetail($examID);
-        $hasDraft           = $this->isUserHasActiveDraft();
+        $hasDraft           = $this->isUserHasActiveDraft($examID);
         if( !$hasDraft )
         {
             $questionDetails    = $this->buildDraftForActiveUser($examID); 
-            $hasDraft           = $this->isUserHasActiveDraft();
+            $hasDraft           = $this->isUserHasActiveDraft($examID);
         }
 
 
@@ -336,11 +336,12 @@ class ExamController extends Controller
         return view('pages.exams.attendance', $params);
     }
 
-    private function isUserHasActiveDraft()
+    private function isUserHasActiveDraft($examID)
     {
         $isAvailable = DB::table('scores')->
         select([ 'id' ])->
         where([ 
+            [ 'examID', '=', $examID ],
             [ 'studentID', '=', Auth::user()->id ],
             [ 'timeFinish', '=', '0' ],
             [ 'trash', '<>', trashed() ],
