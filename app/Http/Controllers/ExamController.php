@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\Continue_;
@@ -26,65 +27,6 @@ class ExamController extends Controller
                 return $this->adminExams();
                 break;
         }
-    }
-
-    private function getExamDetail($examID)
-    {
-        return DB::table('exams')->
-        select([ 'exams.*' ])->
-        where([ 
-            [ 'exams.id', '=', $examID ],
-            [ 'exams.trash', '<>', trashed() ],
-        ])->get()->first();
-        
-    }
-
-    private function getQuestionsByExamID( $examID, $isRandom )
-    {
-        $questionsMasterDetails = DB::table('questions');
-
-        if( $isRandom == 'true' )
-            $questionsMasterDetails = $questionsMasterDetails->inRandomOrder();
-
-        $questionDetail = $questionsMasterDetails->
-        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->select('questions.*')->
-        where([ 
-            [ 'questions.examID', '=', $examID ],
-            [ 'questions.trash', '<>', trashed() ],
-            [ 'questions_detail.trash', '<>', trashed() ],
-        ])->get()->first();
-
-        // ---------------------------------------------------------------------------------------- //
-        
-        $questionsSlaveDetails = DB::table('questions_detail');
-
-        if( $isRandom == 'true' )
-            $questionsSlaveDetails = $questionsSlaveDetails->inRandomOrder();
-
-        $questionSlaveDetail = $questionsSlaveDetails->select('*')->
-        where([ 
-            [ 'questions_detail.questionID', '=', $questionDetail->id ],
-            [ 'questions_detail.trash', '<>', trashed() ],
-        ])->get()->toArray();
-
-
-        return [ 'slaves' => $questionSlaveDetail, 'master' => $questionDetail ];
-    }
-
-    public function attendance($examID)
-    {
-        $examDetails        = $this->getExamDetail($examID);
-
-        $questionDetails    = $this->getQuestionsByExamID($examID, $examDetails->isRandom); 
-      
-
-
-        $params = [
-            'questionsDetails' => $questionDetails,
-            'examDetails'       => $examDetails,
-        ];
-
-        return view('pages.exams.attendance', $params);
     }
 
 
@@ -154,43 +96,10 @@ class ExamController extends Controller
 
     public function addQuestions($examID)
     {
-        $groupedQuestinos   = [];
-        $questions          = DB::table('questions')->
-        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
-        join('exams', 'exams.id', '=', 'questions.examID')->
-        select([ 'questions.*','questions.title as questionsTitle', 'questions.id as masterID', 'questions_detail.correctAnswer', 'questions_detail.title as optionTitle', 'questions.examID', 'questions_detail.questionID','questions_detail.id as slaveID' ])->
-        where([ 
-            [ 'exams.id', '=', $examID ], 
-            [ 'questions.trash', '<>', trashed() ], 
-            [ 'questions_detail.trash', '<>', trashed() ], 
-        ])->get()->toArray();
         
-
-        foreach ($questions as $value) 
-        {
-            $groupedQuestinos[ $value->questionID ]['id']               = $value->id;
-            $groupedQuestinos[ $value->questionID ]['title']            = $value->questionsTitle;
-            $groupedQuestinos[ $value->questionID ]['score']            = $value->score;
-            $groupedQuestinos[ $value->questionID ]['questionType']     = $value->type;
-
-            if(  $value->type == 'multiOption' )
-                $groupedQuestinos[ $value->questionID ]['slavesMultiOption'][]  = $value;
-            else
-                $groupedQuestinos[ $value->questionID ]['slavesMultiOption']    = $this->buildFakeOptionData('multiOption');
-
-            if(  $value->type == 'trueFalse' )
-                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase'][]    = $value;
-            else
-                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase']      = $this->buildFakeOptionData('trueFalse');
-
-            if(  $value->type == 'description' )
-                $groupedQuestinos[ $value->questionID ]['slavesDescription'][]  = $value;
-            else
-                $groupedQuestinos[ $value->questionID ]['slavesDescription']    = $this->buildFakeOptionData('description');
-        }
     
         $params     = [
-            'questions'     => $groupedQuestinos,
+            'questions'     => $this->getQuestionsByExamID( $examID ),
             'examID'        => $examID,
         ];
         return view('pages.exams.addQuestions', $params);
@@ -384,6 +293,231 @@ class ExamController extends Controller
         else
             return false;
     }
+
+
+
+       
+    private function getExamDetail($examID)
+    {
+        return DB::table('exams')->
+        select([ 'exams.*' ])->
+        where([ 
+            [ 'exams.id', '=', $examID ],
+            [ 'exams.trash', '<>', trashed() ],
+        ])->get()->first();
+        
+    }
+
+    
+
+    public function attendance($examID)
+    {
+        $examDetails        = $this->getExamDetail($examID);
+        $hasDraft           = $this->isUserHasActiveDraft();
+        if( !$hasDraft )
+        {
+            $questionDetails    = $this->buildDraftForActiveUser($examID); 
+            $hasDraft           = $this->isUserHasActiveDraft();
+        }
+
+
+
+
+        if( $hasDraft )
+            $questionDetails = $this->getQuestionsByDraftID($hasDraft);
+
+
+
+        $params = [
+            'questionsDetails' => $questionDetails,
+            'examDetails'       => $examDetails,
+        ];
+
+        return view('pages.exams.attendance', $params);
+    }
+
+    private function isUserHasActiveDraft()
+    {
+        $isAvailable = DB::table('scores')->
+        select([ 'id' ])->
+        where([ 
+            [ 'studentID', '=', Auth::user()->id ],
+            [ 'timeFinish', '=', '0' ],
+            [ 'trash', '<>', trashed() ],
+        ])->get()->first();
+        
+        if( $isAvailable )
+            return $isAvailable->id;
+        else
+            return false;
+    }
+
+    private function isExamRandom( $examID ) : bool
+    {
+        $isRandom = DB::table('exams')->
+        select([ 'isRandom' ])->
+        where([ 
+            [ 'exams.id', '=', $examID ],
+            [ 'exams.trash', '<>', trashed() ],
+        ])->get()->first();
+        
+        if( $isRandom->isRandom == 'true' )
+            return true;
+        else
+            return false;
+    }
+
+
+    private function buildDraftForActiveUser( $examID ) : bool
+    {
+        $questions              = $this->randomizeQuestionsIfNeeded( $examID, $this->getQuestionsByExamID( $examID ) );
+        
+
+        $masterTableData    = [
+            'examID'        => $examID,
+            'studentID'     => Auth::user()->id,
+            'timeStart'     => time(),
+            'timeFinish'    => '0',
+        ];
+
+        $insertedID             = DB::table('scores')->insertGetId($masterTableData);
+        if( !$insertedID )
+            return false;
+
+        foreach ($questions as $value) 
+        {
+            $slaveTableData[]    = [
+                'scoreID'               => $insertedID,
+                'questionID'            => $value['id'],
+                'answer'                => 0,
+                'answerTime'            => 0,
+            ];
+        }
+        $resultOfMultiInsert    = DB::table('scores_detail')->insert($slaveTableData);
+        if( !$resultOfMultiInsert )
+            return false;
+
+
+        return true;
+        
+    }
+
+    private function randomizeQuestionsIfNeeded( $examID, $questions )
+    {
+        $isRandom          = $this->isExamRandom( $examID );
+        if( !$isRandom ) 
+            return $questions;
+        shuffle( $questions );
+        foreach ($questions as &$value) 
+            shuffle( $value['slavesMultiOption'] );
+
+        return $questions;
+    }
+
+    private function getQuestionsByExamID( $examID )
+    {
+        $groupedQuestinos  = [];
+        $questions         = DB::table('questions')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
+        join('exams', 'exams.id', '=', 'questions.examID')->
+        select([ 
+            'questions.*',
+            'questions.title as questionsTitle',
+            'questions.id as masterID',
+            'questions_detail.correctAnswer',
+            'questions_detail.title as optionTitle',
+            'questions.examID',
+            'questions_detail.questionID',
+            'questions_detail.id as slaveID' 
+        ])->
+        where([ 
+            [ 'exams.id', '=', $examID ], 
+            [ 'questions.trash', '<>', trashed() ], 
+            [ 'questions_detail.trash', '<>', trashed() ], 
+        ])->get()->toArray();
+        
+
+        foreach ($questions as $value) 
+        {
+            $groupedQuestinos[ $value->questionID ]['id']               = $value->id;
+            $groupedQuestinos[ $value->questionID ]['title']            = $value->questionsTitle;
+            $groupedQuestinos[ $value->questionID ]['score']            = $value->score;
+            $groupedQuestinos[ $value->questionID ]['questionType']     = $value->type;
+
+            if(  $value->type == 'multiOption' )
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption']    = $this->buildFakeOptionData('multiOption');
+
+            if(  $value->type == 'trueFalse' )
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase'][]    = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase']      = $this->buildFakeOptionData('trueFalse');
+
+            if(  $value->type == 'description' )
+                $groupedQuestinos[ $value->questionID ]['slavesDescription'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesDescription']    = $this->buildFakeOptionData('description');
+        }
+
+        return $groupedQuestinos;
+    }
+
+
+
+    
+    private function getQuestionsByDraftID( $draftID )
+    {
+        $questionIDs            = $this->convertObjToSingleArray( $this->getQuestionsIDByDraftID($draftID) );
+        
+        $questionsMasterDetails = DB::table('questions')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->select('questions.*')->
+        where([ 
+            [ 'questions.trash', '<>', trashed() ],
+            [ 'questions_detail.trash', '<>', trashed() ],
+        ])->
+        whereIn('questions.id',$questionIDs)->get()->first();
+
+        // ---------------------------------------------------------------------------------------- //
+        
+        $questionsSlaveDetails = DB::table('questions_detail')->select('*')->
+        where([ 
+            [ 'questions_detail.questionID', '=', $questionsMasterDetails->id ],
+            [ 'questions_detail.trash', '<>', trashed() ],
+        ])->get()->toArray();
+
+
+        return [ 'slaves' => $questionsSlaveDetails, 'master' => $questionsMasterDetails ];
+    }
+
+
+    private function getQuestionsIDByDraftID($draftID)
+    {
+        $questionIDs  = DB::table('scores')->
+        join('scores_detail', 'scores.id', '=', 'scores_detail.scoreID')
+        ->select('scores_detail.questionID')
+        ->where([ 
+            ['scores.id', '=', $draftID],
+            ['scores.trash', '<>', trashed()],
+            ['scores_detail.trash', '<>', trashed()],
+        ])->orderBy('questionID')->get()->toArray();
+
+        return $questionIDs;
+    }
+
+
+    private function convertObjToSingleArray($objs)
+    {
+        $result = [];
+        foreach ($objs as $eachObj) 
+            $result[] = $eachObj->questionID;
+
+        return $result;
+    }
+
+
+
+    
 
 
     
