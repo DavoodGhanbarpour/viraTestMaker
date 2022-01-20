@@ -23,11 +23,10 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', [ AthenticationController::class, 'index' ]);
 Route::get('/login', [ AthenticationController::class, 'index' ])->name('login');
-Route::get('/logout', [ AthenticationController::class, 'logout' ])->name('logout');
 Route::post('/authenticate', [ AthenticationController::class, 'authenticate' ])->name('authenticate');
 
 Route::middleware(['auth'])->group(function () {
-
+    Route::get('/logout', [ AthenticationController::class, 'logout' ])->name('logout');
 
     /**
      * Main
