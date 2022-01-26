@@ -194,7 +194,7 @@ class ExamController extends Controller
     {
         
         $examData =  DB::table('scores_detail')->
-        select([ 'scores.examID', 'scores_detail.id as scoreDraftID' ])->
+        select([ 'scores.id as scoreMasterID','scores.examID', 'scores_detail.id as scoreDraftID' ])->
         join('scores', 'scores.id', '=', 'scores_detail.scoreID')->
         where([ 
             [ 'scores_detail.trash', '<>', trashed() ], 
@@ -212,16 +212,26 @@ class ExamController extends Controller
         ->where('trash', '<>' ,trashed())
         ->update([ 'answer' => $inputs['correctAnswer'], 'answerTime' => time() ]);
 
+        $nextOrPrevID = $this->nextOrPrevID( $examData->scoreDraftID , $examData->scoreMasterID );
+
+        if( $nextOrPrevID[ $moveType ] )
+            $questionToShow = $nextOrPrevID[ $moveType ];
+        else
+            $questionToShow = $examData->scoreDraftID;
+        
 
         if( $affected )
-            return $this->attendance( $examData->examID, $examData->scoreDraftID );
+            return $this->attendance( $examData->examID, $questionToShow );
         else
             return back()->with('flashMessage',messageErrors( 412 ) );
     }
 
-    private function nextOrPrevID($id, $type)
+    private function nextOrPrevID($scoreDetailID, $scoreID)
     {
-        
+        $previous   = DB::table('scores_detail')->where([[ 'scoreID', '=', $scoreID ], [ 'id', '<', $scoreDetailID ] ])->max('id');
+        $next       = DB::table('scores_detail')->where([[ 'scoreID', '=', $scoreID ], [ 'id', '>', $scoreDetailID ] ])->min('id');
+
+        return [ 'next' => $next, 'prev' => $previous ];
     }
 
     
