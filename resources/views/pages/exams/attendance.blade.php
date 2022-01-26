@@ -1,7 +1,7 @@
 @extends('base')
     @section('content')
         <div class="col-12">
-            <form action="/class/insert" method="post" class="card" enctype="multipart/form-data">
+            <form action="{{route('updateExamQuestion',[ 'questionID' =>  $questionsDetails['master']->id ])}}" method="post" class="card" id="questionForm" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="row">
@@ -18,7 +18,7 @@
                                             <div class="mb-3">
                                                 <div class="row">
                                                     <div class="col-1">
-                                                        <input type="radio" name="correctAnswer" id="correctAnswer{{$eachKey+1}}">
+                                                        <input type="radio" name="correctAnswer" value="{{$eachItem->id}}" id="correctAnswer{{$eachKey+1}}">
                                                     </div>
                                                     <div class="col-11">
                                                         <label class="form-label" for="correctAnswer{{$eachKey+1}}">{{$eachItem->title}}</label>
@@ -35,7 +35,6 @@
                                             </div>
                                         </div> 
                                     @endif
-                            
                                     {{-- <div class="mb-3">
                                         <div class="row">
                                             <div class="col-1">
@@ -72,8 +71,8 @@
                     </div>
                     <div class="form-footer">
                         <div class="d-flex justify-content-evenly">
-                            <button class="btn">قبلی</button>
-                            <button class="btn">بعدی</button>
+                            <a id="previousQ" class="btn">قبلی</a>
+                            <a id="nextQ" class="btn">بعدی</a>
                         </div>
                     </div>
                 </div>
@@ -88,6 +87,30 @@
 @endsection
 
 @section('scripts')
+<script>
+    $(document).on('click', '#previousQ,#nextQ', function (e) { 
+        changeAction( $(this).attr('id') );
+    });
+
+    function changeAction(action) 
+    {
+        moveType = '';
+        switch (action) 
+        {
+            case 'previousQ':
+                moveType = 'prev';
+                break;
+            case 'nextQ':
+                moveType = 'next';
+                break;
+        }
+
+        lastAction = $('#questionForm').attr('action');
+        $('#questionForm').attr('action', lastAction + '/' + moveType );
+        $('#questionForm').submit();
+    }
+</script>
+
 <x-datepicker-renger/>
 @endsection
 

@@ -44,8 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/exams/{id}', [ ExamController::class, 'examsOfAClass' ])->name('examsOfACourse');
     Route::get('/attendance/{examID}', [ ExamController::class, 'attendance' ])->name('attendance');
     Route::get('/attendance/{examID}/{questionID}', [ ExamController::class, 'attendance' ])->name('attendanceWithQuestion');
-    Route::get('/attendance/answer/{examID}/{questionID}', [ ExamController::class, 'attendance' ])->name('answerExam');
-
+    Route::post('/attendance/answer/{questionID}/{moveType?}', [ ExamController::class, 'updateExamQuestionResult' ])->name('updateExamQuestion');
 
     Route::middleware(['godUsers'])->group(function () {
         Route::get('/course/add', [ CourseController::class, 'addCourse' ])->name('addCourse');
@@ -91,7 +90,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/exam/questions/{id}', [ ExamController::class, 'addQuestions' ])->name('addQuestions');
         Route::get('/exam/edit/{id}', [ ExamController::class, 'editExam' ])->name('editExam');
         Route::get('/exam/delete/{id}', [ ExamController::class, 'deleteExam' ])->name('deleteExam');
-        Route::post('/exam/insertQuestion/{id}', [ ExamController::class, 'insertQuestions' ])->name('insertQuestions');
         Route::post('/exam/insert', [ ExamController::class, 'insertExam' ])->name('insertExam');
         Route::post('/exam/update/{id}', [ ExamController::class, 'updateExam' ])->name('updateExam');
 

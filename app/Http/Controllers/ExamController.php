@@ -189,6 +189,40 @@ class ExamController extends Controller
         return view('pages.exams.edit', $params);
     }
 
+    
+    public function updateExamQuestionResult( Request $request,$draftQuestionID, $moveType )
+    {
+        
+        $examData =  DB::table('scores_detail')->
+        select([ 'scores.examID', 'scores_detail.id as scoreDraftID' ])->
+        join('scores', 'scores.id', '=', 'scores_detail.scoreID')->
+        where([ 
+            [ 'scores_detail.trash', '<>', trashed() ], 
+            [ 'scores.trash', '<>', trashed() ], 
+            [ 'scores_detail.questionID', '=', $draftQuestionID ], 
+        ])->get()->first() ?? null;
+        
+        if( !$examData->examID ) 
+            return back()->with('flashMessage',messageErrors( 411 ) );
+
+        
+        $inputs = $request->input();
+        $affected = DB::table('scores_detail')
+        ->where('questionID', '=' ,$draftQuestionID)
+        ->where('trash', '<>' ,trashed())
+        ->update([ 'answer' => $inputs['correctAnswer'], 'answerTime' => time() ]);
+
+
+        if( $affected )
+            return $this->attendance( $examData->examID, $examData->scoreDraftID );
+        else
+            return back()->with('flashMessage',messageErrors( 412 ) );
+    }
+
+    private function nextOrPrevID($id, $type)
+    {
+        
+    }
 
     
     public function deleteExam( $courseID )
@@ -310,8 +344,9 @@ class ExamController extends Controller
 
     
 
-    public function attendance($examID)
+    public function attendance($examID, $questionToShowID = null)
     {
+        
         $examDetails        = $this->getExamDetail($examID);
         $hasDraft           = $this->isUserHasActiveDraft($examID);
         if( !$hasDraft )
@@ -324,7 +359,13 @@ class ExamController extends Controller
 
 
         if( $hasDraft )
-            $questionDetails = $this->getQuestionsByDraftID($hasDraft);
+        {
+            if( $questionToShowID )
+                $questionDetails = $this->getQuestionsByDraftDetailID($questionToShowID);
+                
+            else
+                $questionDetails = $this->getQuestionsByDraftID($hasDraft);
+        }
 
 
 
@@ -465,7 +506,29 @@ class ExamController extends Controller
     }
 
 
+    private function getQuestionsByDraftDetailID( $draftDetailID )
+    {
+        $questionID             = $this->getQuestionsIDByDraftDetailID($draftDetailID);
+        
+        $questionsMasterDetails = DB::table('questions')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->select('questions.*')->
+        where([ 
+            [ 'questions.trash', '<>', trashed() ],
+            [ 'questions.id', '=', $questionID->questionID ],
+            [ 'questions_detail.trash', '<>', trashed() ],
+        ])->get()->first();
 
+        // ---------------------------------------------------------------------------------------- //
+        
+        $questionsSlaveDetails = DB::table('questions_detail')->select('*')->
+        where([ 
+            [ 'questions_detail.questionID', '=', $questionsMasterDetails->id ],
+            [ 'questions_detail.trash', '<>', trashed() ],
+        ])->get()->toArray();
+
+
+        return [ 'slaves' => $questionsSlaveDetails, 'master' => $questionsMasterDetails ];
+    }
     
     private function getQuestionsByDraftID( $draftID )
     {
@@ -492,6 +555,18 @@ class ExamController extends Controller
     }
 
 
+    private function getQuestionsIDByDraftDetailID($draftDetailID)
+    {
+        $questionIDs  = DB::table('scores_detail')
+        ->select('scores_detail.questionID')
+        ->where([ 
+            ['scores_detail.id', '=', $draftDetailID],
+            ['scores_detail.trash', '<>', trashed()],
+        ])->get()->first();
+
+        return $questionIDs;
+    }
+    
     private function getQuestionsIDByDraftID($draftID)
     {
         $questionIDs  = DB::table('scores')->
@@ -515,6 +590,8 @@ class ExamController extends Controller
 
         return $result;
     }
+
+
 
 
 

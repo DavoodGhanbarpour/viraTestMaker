@@ -18,6 +18,8 @@
             '408'       => [ 'type' => 'danger', 'message' => 'کاربر مورد نظر یافت نشد' ],
             '409'       => [ 'type' => 'danger', 'message' => 'در این تاریخ برای این درس امتحان دیگری وجود دارد' ],
             '410'       => [ 'type' => 'danger', 'message' => 'تاریخ آزمون به درستی انتخاب نشده است' ],
+            '411'       => [ 'type' => 'danger', 'message' => 'آزمون شناخته نشد' ],
+            '412'       => [ 'type' => 'danger', 'message' => 'خطا در ثبت آزمون' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];
