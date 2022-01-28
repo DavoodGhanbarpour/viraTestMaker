@@ -37,7 +37,8 @@ class ExamController extends Controller
         join('users', 'users.id', '=', 'classes.teacherID')->
         join('courses', 'courses.id', '=', 'classes.courseID')->
         join('semesters', 'semesters.id', '=', 'classes.semesterID')->
-        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle' ])->
+        join('scores', 'scores.examID', '=', 'exams.id')->
+        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle','scores.timeFinish as timeFinishedDate' ])->
         where([ 
             [ 'classes.id', '=', $classID ], 
             [ 'classes.trash', '<>', trashed() ], 
@@ -192,7 +193,7 @@ class ExamController extends Controller
     
     public function updateExamQuestionResult( Request $request,$draftQuestionID, $moveType )
     {
-        
+
         $examData =  DB::table('scores_detail')->
         select([ 'scores.id as scoreMasterID','scores.examID', 'scores_detail.id as scoreDraftID' ])->
         join('scores', 'scores.id', '=', 'scores_detail.scoreID')->
@@ -211,6 +212,10 @@ class ExamController extends Controller
         ->where('questionID', '=' ,$draftQuestionID)
         ->where('trash', '<>' ,trashed())
         ->update([ 'answer' => $inputs['correctAnswer'], 'answerTime' => time() ]);
+
+        if( $moveType == 'finish' )
+            return $this->finishExam( $examData->examID );
+
 
         $nextOrPrevID = $this->nextOrPrevID( $examData->scoreDraftID , $examData->scoreMasterID );
 
@@ -232,6 +237,19 @@ class ExamController extends Controller
         $next       = DB::table('scores_detail')->where([[ 'scoreID', '=', $scoreID ], [ 'id', '>', $scoreDetailID ] ])->min('id');
 
         return [ 'next' => $next, 'prev' => $previous ];
+    }
+
+    private function finishExam( $examID )
+    {
+        $affected = DB::table('scores')
+        ->where('examID', '=' ,$examID)
+        ->where('trash', '<>' ,trashed())
+        ->update([ 'timeFinish' => time() ]);
+
+        if( $affected )
+            return redirect('dashboard')->with('flashMessage',messageErrors( 200 ) );
+        else
+            return back()->with('flashMessage',messageErrors( 412 ) );
     }
 
     
@@ -358,7 +376,12 @@ class ExamController extends Controller
     {
         
         $examDetails        = $this->getExamDetail($examID);
+        $wasExamFinished    = $this->isUserHadFinishExam($examID);
+        if( $wasExamFinished )
+            return back()->with('flashMessage', messageErrors( 413 ) );
+
         $hasDraft           = $this->isUserHasActiveDraft($examID);
+        
         if( !$hasDraft )
         {
             $questionDetails    = $this->buildDraftForActiveUser($examID); 
@@ -378,13 +401,58 @@ class ExamController extends Controller
         }
 
 
-
         $params = [
-            'questionsDetails' => $questionDetails,
+            'questionsDetails'  => $questionDetails,
             'examDetails'       => $examDetails,
         ];
 
+        if( $hasDraft )
+        {
+            $params['isLastQuestion']    = $this->isLastQuestion( $hasDraft, $questionDetails['master']->id );
+            $params['isFirstQuestion']   = $this->isFirstQuestion( $hasDraft, $questionDetails['master']->id );
+        }
+
         return view('pages.exams.attendance', $params);
+    }
+
+    private function isLastQuestion($draftID, $questionID)
+    {
+        $orderOfQuestion  = DB::table('scores')->
+        join('scores_detail', 'scores.id', '=', 'scores_detail.scoreID')
+        ->select('scores_detail.number')
+        ->where([ 
+            ['scores.id', '=', $draftID],
+            ['scores.trash', '<>', trashed()],
+            ['scores_detail.trash', '<>', trashed()],
+        ])->get()->max('number');
+
+
+        $currentNumber = DB::table('scores_detail')->select('number')->where([ ['scores_detail.questionID', '=', $questionID] ])->first()->number;
+    
+        if( $currentNumber == $orderOfQuestion )
+            return true;
+
+        return false;
+    }
+
+    private function isFirstQuestion($draftID, $questionID)
+    {
+        $orderOfQuestion  = DB::table('scores')->
+        join('scores_detail', 'scores.id', '=', 'scores_detail.scoreID')
+        ->select('scores_detail.number')
+        ->where([ 
+            ['scores.id', '=', $draftID],
+            ['scores.trash', '<>', trashed()],
+            ['scores_detail.trash', '<>', trashed()],
+        ])->get()->min('number');
+
+        $currentNumber = DB::table('scores_detail')->select('number')->where([ ['scores_detail.questionID', '=', $questionID] ])->first()->number;
+
+      
+        if( $currentNumber == $orderOfQuestion )
+            return true;
+
+        return false;
     }
 
     private function isUserHasActiveDraft($examID)
@@ -395,6 +463,23 @@ class ExamController extends Controller
             [ 'examID', '=', $examID ],
             [ 'studentID', '=', Auth::user()->id ],
             [ 'timeFinish', '=', '0' ],
+            [ 'trash', '<>', trashed() ],
+        ])->get()->first();
+        
+        if( $isAvailable )
+            return $isAvailable->id;
+        else
+            return false;
+    }
+    
+    private function isUserHadFinishExam($examID)
+    {
+        $isAvailable = DB::table('scores')->
+        select([ 'id' ])->
+        where([ 
+            [ 'examID', '=', $examID ],
+            [ 'studentID', '=', Auth::user()->id ],
+            [ 'timeFinish', '!=', '0' ],
             [ 'trash', '<>', trashed() ],
         ])->get()->first();
         

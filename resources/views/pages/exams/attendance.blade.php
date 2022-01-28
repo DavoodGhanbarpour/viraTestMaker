@@ -18,7 +18,7 @@
                                             <div class="mb-3">
                                                 <div class="row">
                                                     <div class="col-1">
-                                                        <input type="radio" name="correctAnswer" value="{{$eachItem->id}}" id="correctAnswer{{$eachKey+1}}">
+                                                        <input type="radio" name="correctAnswer" {{ $eachKey == 0 ? 'checked' : '' }} value="{{$eachItem->id}}" id="correctAnswer{{$eachKey+1}}">
                                                     </div>
                                                     <div class="col-11">
                                                         <label class="form-label" for="correctAnswer{{$eachKey+1}}">{{$eachItem->title}}</label>
@@ -71,8 +71,15 @@
                     </div>
                     <div class="form-footer">
                         <div class="d-flex justify-content-evenly">
-                            <a id="previousQ" class="btn">قبلی</a>
-                            <a id="nextQ" class="btn">بعدی</a>
+                            @if ( !$isFirstQuestion )
+                                <a id="previousQ" class="btn">قبلی</a>
+                            @endif
+
+                            @if ( !$isLastQuestion )
+                                <a id="nextQ" class="btn">بعدی</a>
+                            @else
+                                <a id="finishE" class="btn">اتمام آزمون</a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -88,7 +95,7 @@
 
 @section('scripts')
 <script>
-    $(document).on('click', '#previousQ,#nextQ', function (e) { 
+    $(document).on('click', '#previousQ,#nextQ,#finishE', function (e) { 
         changeAction( $(this).attr('id') );
     });
 
@@ -100,10 +107,18 @@
             case 'previousQ':
                 moveType = 'prev';
                 break;
+
             case 'nextQ':
                 moveType = 'next';
                 break;
+
+            case 'finishE':
+                moveType = 'finish';
+                break;
         }
+
+        if ( confirm("آیا برای اتمام آزمون مطمئن میباشید؟") == false && moveType == 'finish') 
+            return;
 
         lastAction = $('#questionForm').attr('action');
         $('#questionForm').attr('action', lastAction + '/' + moveType );

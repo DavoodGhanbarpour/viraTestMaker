@@ -20,6 +20,7 @@
             '410'       => [ 'type' => 'danger', 'message' => 'تاریخ آزمون به درستی انتخاب نشده است' ],
             '411'       => [ 'type' => 'danger', 'message' => 'آزمون شناخته نشد' ],
             '412'       => [ 'type' => 'danger', 'message' => 'خطا در ثبت آزمون' ],
+            '413'       => [ 'type' => 'danger', 'message' => 'قبلا در آزمون شرکت کرده اید' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];

@@ -90,10 +90,15 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-info btn-sm" href="{{route('attendance',['examID'=>$eachExam->id])}}">
-                                                شرکت در آزمون
-                                            </a>
-
+                                            @if ( !$eachExam->timeFinishedDate )
+                                                <a class="btn btn-info btn-sm" href="{{route('attendance',['examID'=>$eachExam->id])}}">
+                                                    شرکت در آزمون
+                                                </a> 
+                                            @else
+                                                <a class="btn btn-info btn-sm" >
+                                                    مشاهده نمره
+                                                </a> 
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
