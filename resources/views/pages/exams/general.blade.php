@@ -14,8 +14,6 @@
                                 <th>تاریخ پایان</th>
                                 <th>مدت زمان</th>
                                 <th>امکان مرور</th>
-                                <th>امکان جا به جایی میان سوالات</th>
-                                <th>دفعات تکرار آزمون</th>
                                 <th class="w-1"></th>
                             </tr>
                             </thead>
@@ -71,20 +69,6 @@
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
                                                 <div class="font-weight-medium">{{ trueFalseTitle($eachExam->isReviewAllowed) }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex py-1 align-items-center">
-                                            <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ trueFalseTitle($eachExam->isMoveAllowed) }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex py-1 align-items-center">
-                                            <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachExam->timesToTry }}</div>
                                             </div>
                                         </div>
                                     </td>

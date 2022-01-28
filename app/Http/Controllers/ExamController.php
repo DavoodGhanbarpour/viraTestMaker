@@ -273,14 +273,12 @@ class ExamController extends Controller
             'title'             => $inputs['title'],
             'classID'           => $inputs['class'],
             'score'             => toEngNumbers($inputs['score']),
-            'timesToTry'        => toEngNumbers($inputs['timesToTry']),
             'dateStart'         => datepickerToTimestamp($inputs['dateStart']),
             'dateFinish'        => datepickerToTimestamp($inputs['dateFinish']),
             'timeStart'         => timepickerToTimestamp($inputs['timeStart']),
             'timeFinish'        => timepickerToTimestamp($inputs['timeFinish']),
             'isRandom'          => $inputs['random'] == 'TRUE' ? 'true' : 'false',
             'isReviewAllowed'   => $inputs['random'] == 'TRUE' ? 'true' : 'false',
-            'isMoveAllowed'     => $inputs['random'] == 'TRUE' ? 'true' : 'false',
         ];
 
         if( $this->isThisDayHasExam( $dataToInsert['dateStart'], $dataToInsert['dateFinish'], $dataToInsert['classID'] ) )
@@ -306,14 +304,12 @@ class ExamController extends Controller
             'title'             => $inputs['title'],
             'classID'           => $inputs['class'],
             'score'             => toEngNumbers($inputs['score']),
-            'timesToTry'        => toEngNumbers($inputs['timesToTry']),
             'dateStart'         => datepickerToTimestamp($inputs['dateStart']),
             'dateFinish'        => datepickerToTimestamp($inputs['dateFinish']),
             'timeStart'         => timepickerToTimestamp($inputs['timeStart']),
             'timeFinish'        => timepickerToTimestamp($inputs['timeFinish']),
             'isRandom'          => $inputs['random'] == 'TRUE' ? 'true' : 'false',
             'isReviewAllowed'   => $inputs['random'] == 'TRUE' ? 'true' : 'false',
-            'isMoveAllowed'     => $inputs['random'] == 'TRUE' ? 'true' : 'false',
         ];
 
         if( $this->isThisDayHasExam( $dataToUpdate['dateStart'], $dataToUpdate['dateFinish'], $dataToUpdate['classID'], $examID ) )
