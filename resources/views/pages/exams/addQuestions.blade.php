@@ -39,126 +39,229 @@
                             @php
                                 $index = 1;
                             @endphp
-                            @foreach ($questions as $key => $eachQuestion)
-                            <div class="row px-1" data-repeater-item>
-                                <div class="col-1 text-center">
-                                    @php
-                                        echo $index++;
-                                    @endphp
-                                </div>
-                                <div class="col-3">
-                                    <input type="text" class="form-control" name="title" value="{{ $eachQuestion['title'] }}" required>
-                                    <input type="hidden" name="lastQuestionID" value="{{ $eachQuestion['id'] }}">
-                                </div>
-                                <div class="col-1">
-                                    <input type="text" class="form-control" name="score" value="{{ $eachQuestion['score'] }}" required>
-                                </div>
-                                <div class="col-3">
-                                    <select class="form-control questionsTypeSelect" name="questionType">
-                                        @foreach (questionTypes() as $key => $item)
-                                            @php
-                                                $selected = ( $key == $eachQuestion['questionType'] ) ? 'selected' : '' ;
-                                            @endphp
-                                            <option {{$selected}} value="{{$key}}" >{{$item}}</option>    
-                                        @endforeach
-                                    </select>
-                                </div>
-                                    <div class="col-3 questionsTypeSection" data-question-type="multiOption">
-                                        <div class="row pb-2">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                                @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][0]->correctAnswer == "true" ) ? 'checked' : '' ;
-                                                @endphp 
-                                                <input type="radio" name="correctAnswer" value="1"  {{$selected}}>
+                            @if ( !$questions )
+                                    
+                                
+                              
+                                <div class="row px-1" data-repeater-item>
+                                    <div class="col-1 text-center">
+                                        @php
+                                            echo $index++;
+                                        @endphp
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="text" class="form-control" name="title" value="" required>
+                                        <input type="hidden" name="lastQuestionID" value="">
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="text" class="form-control" name="score" value="" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <select class="form-control questionsTypeSelect" name="questionType">
+                                            @foreach (questionTypes() as $key => $item)
+                                                <option value="{{$key}}" >{{$item}}</option>    
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                        <div class="col-3 questionsTypeSection" data-question-type="multiOption">
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    <input type="radio" name="correctAnswer" value="1" >
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer1" value="" required>
+                                                </div>
                                             </div>
-                                            <div class="col-10">
-                                                <input type="text" class="form-control" name="answer1" value="{{ $eachQuestion['slavesMultiOption'][0]->optionTitle }}" required>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    <input type="radio" name="correctAnswer" value="2" >
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text"  class="form-control" name="answer2" value="" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    <input type="radio" name="correctAnswer" value="3" >
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer3" value="" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    <input type="radio" name="correctAnswer" value="4"  >
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer4" value="" required>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="row pb-2">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                                @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][1]->correctAnswer == "true" ) ? 'checked' : '' ;
-                                                @endphp 
-                                                <input type="radio" name="correctAnswer" value="2"  {{ ( $eachQuestion['slavesMultiOption'][1]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                        <div class="col-3 questionsTypeSection d-none" data-question-type="trueFalse">
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    <input type="radio" name="correctAnswer" value="1"  >
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer1" value="" required>
+                                                </div>
                                             </div>
-                                            <div class="col-10">
-                                                <input type="text"  class="form-control" name="answer2" value="{{ $eachQuestion['slavesMultiOption'][1]->optionTitle }}" required>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    <input type="radio" name="correctAnswer" value="2"  >
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text"  class="form-control" name="answer2" value="" required>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="row pb-2">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                                @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][2]->correctAnswer == "true" ) ? 'checked' : '' ;
-                                                @endphp 
-                                                <input type="radio" name="correctAnswer" value="3"  {{ ( $eachQuestion['slavesMultiOption'][2]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
-                                            </div>
-                                            <div class="col-10">
-                                                <input type="text" class="form-control" name="answer3" value="{{ $eachQuestion['slavesMultiOption'][2]->optionTitle }}" required>
+                                        <div class="col-3 questionsTypeSection d-none" data-question-type="description">
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    &nbsp;
+                                                </div>
+                                                <div class="col-10">
+                                                    <textarea class="form-control" name="answer" rows="3"></textarea>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="row pb-2">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                                @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][3]->correctAnswer == "true" ) ? 'checked' : '' ;
-                                                @endphp 
-                                                <input type="radio" name="correctAnswer" value="4"  {{ ( $eachQuestion['slavesMultiOption'][3]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
-                                            </div>
-                                            <div class="col-10">
-                                                <input type="text" class="form-control" name="answer4" value="{{ $eachQuestion['slavesMultiOption'][3]->optionTitle }}" required>
-                                            </div>
-                                        </div>
+                                    <div class="col-1 text-center">
+                                        <a class="btn btn-danger" data-repeater-delete>
+                                            حذف
+                                        </a>
                                     </div>
 
-                                    <div class="col-3 questionsTypeSection d-none" data-question-type="trueFalse">
-                                        <div class="row pb-2">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                                @php
-                                                    $selected = ( $eachQuestion['slavesTrueFlase'][0]->correctAnswer == "true" ) ? 'checked' : '' ;
-                                                @endphp 
-                                                <input type="radio" name="correctAnswer" value="1"  {{ ( $eachQuestion['slavesTrueFlase'][0]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
-                                            </div>
-                                            <div class="col-10">
-                                                <input type="text" class="form-control" name="answer1" value="{{ $eachQuestion['slavesTrueFlase'][0]->optionTitle }}" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="row pb-2">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">
-                                                @php
-                                                    $selected = ( $eachQuestion['slavesTrueFlase'][1]->correctAnswer == "true" ) ? 'checked' : '' ;
-                                                @endphp 
-                                                <input type="radio" name="correctAnswer" value="2"  {{ ( $eachQuestion['slavesTrueFlase'][1]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
-                                            </div>
-                                            <div class="col-10">
-                                                <input type="text"  class="form-control" name="answer2" value="{{ $eachQuestion['slavesTrueFlase'][1]->optionTitle }}" required>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-3 questionsTypeSection d-none" data-question-type="description">
-                                        <div class="row">
-                                            <div class="col-2">
-                                                &nbsp;
-                                            </div>
-                                            <div class="col-10">
-                                                <textarea class="form-control" name="answer" rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                <div class="col-1 text-center">
-                                    <a class="btn btn-danger" data-repeater-delete>
-                                        حذف
-                                    </a>
                                 </div>
+                                @else
+                                    
+                                
+                                @foreach ($questions as $key => $eachQuestion)
+                                <div class="row px-1" data-repeater-item>
+                                    <div class="col-1 text-center">
+                                        @php
+                                            echo $index++;
+                                        @endphp
+                                    </div>
+                                    <div class="col-3">
+                                        <input type="text" class="form-control" name="title" value="{{ $eachQuestion['title'] }}" required>
+                                        <input type="hidden" name="lastQuestionID" value="{{ $eachQuestion['id'] }}">
+                                    </div>
+                                    <div class="col-1">
+                                        <input type="text" class="form-control" name="score" value="{{ $eachQuestion['score'] }}" required>
+                                    </div>
+                                    <div class="col-3">
+                                        <select class="form-control questionsTypeSelect" name="questionType">
+                                            @foreach (questionTypes() as $key => $item)
+                                                @php
+                                                    $selected = ( $key == $eachQuestion['questionType'] ) ? 'selected' : '' ;
+                                                @endphp
+                                                <option {{$selected}} value="{{$key}}" >{{$item}}</option>    
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                        <div class="col-3 questionsTypeSection" data-question-type="multiOption">
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    @php
+                                                        $selected = ( $eachQuestion['slavesMultiOption'][0]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    @endphp 
+                                                    <input type="radio" name="correctAnswer" value="1"  {{$selected}}>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer1" value="{{ $eachQuestion['slavesMultiOption'][0]->optionTitle }}" required>
+                                                </div>
+                                            </div>
 
-                            </div>
-                            @endforeach
-                            
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    @php
+                                                        $selected = ( $eachQuestion['slavesMultiOption'][1]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    @endphp 
+                                                    <input type="radio" name="correctAnswer" value="2"  {{ ( $eachQuestion['slavesMultiOption'][1]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text"  class="form-control" name="answer2" value="{{ $eachQuestion['slavesMultiOption'][1]->optionTitle }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    @php
+                                                        $selected = ( $eachQuestion['slavesMultiOption'][2]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    @endphp 
+                                                    <input type="radio" name="correctAnswer" value="3"  {{ ( $eachQuestion['slavesMultiOption'][2]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer3" value="{{ $eachQuestion['slavesMultiOption'][2]->optionTitle }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    @php
+                                                        $selected = ( $eachQuestion['slavesMultiOption'][3]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    @endphp 
+                                                    <input type="radio" name="correctAnswer" value="4"  {{ ( $eachQuestion['slavesMultiOption'][3]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer4" value="{{ $eachQuestion['slavesMultiOption'][3]->optionTitle }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3 questionsTypeSection d-none" data-question-type="trueFalse">
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    @php
+                                                        $selected = ( $eachQuestion['slavesTrueFlase'][0]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    @endphp 
+                                                    <input type="radio" name="correctAnswer" value="1"  {{ ( $eachQuestion['slavesTrueFlase'][0]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" class="form-control" name="answer1" value="{{ $eachQuestion['slavesTrueFlase'][0]->optionTitle }}" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-2">
+                                                <div class="col-2 d-flex align-items-center justify-content-center">
+                                                    @php
+                                                        $selected = ( $eachQuestion['slavesTrueFlase'][1]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    @endphp 
+                                                    <input type="radio" name="correctAnswer" value="2"  {{ ( $eachQuestion['slavesTrueFlase'][1]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text"  class="form-control" name="answer2" value="{{ $eachQuestion['slavesTrueFlase'][1]->optionTitle }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3 questionsTypeSection d-none" data-question-type="description">
+                                            <div class="row">
+                                                <div class="col-2">
+                                                    &nbsp;
+                                                </div>
+                                                <div class="col-10">
+                                                    <textarea class="form-control" name="answer" rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    <div class="col-1 text-center">
+                                        <a class="btn btn-danger" data-repeater-delete>
+                                            حذف
+                                        </a>
+                                    </div>
+
+                                </div>
+                                @endforeach
+                            @endif
                
                         </div>
                         <div class="d-flex justify-content-end">

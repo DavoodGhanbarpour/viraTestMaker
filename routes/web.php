@@ -88,6 +88,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/exams', [ ExamController::class, 'index' ])->name('exams');
         Route::get('/exam/add', [ ExamController::class, 'addExam' ])->name('addExam');
         Route::get('/exam/questions/{id}', [ ExamController::class, 'addQuestions' ])->name('addQuestions');
+        Route::post('/exam/insertQuestions/{id}', [ ExamController::class, 'insertQuestions' ])->name('insertQuestions');
         Route::get('/exam/edit/{id}', [ ExamController::class, 'editExam' ])->name('editExam');
         Route::get('/exam/delete/{id}', [ ExamController::class, 'deleteExam' ])->name('deleteExam');
         Route::post('/exam/insert', [ ExamController::class, 'insertExam' ])->name('insertExam');

@@ -99,7 +99,7 @@ class ExamController extends Controller
         
     
         $params     = [
-            'questions'     => $this->getQuestionsByExamID( $examID ),
+            'questions'     => $this->getQuestionsByExamID( $examID ) ?? [],
             'examID'        => $examID,
         ];
         return view('pages.exams.addQuestions', $params);
@@ -145,7 +145,7 @@ class ExamController extends Controller
             }
             $questionsMaster    = [
                 'examID'        => $examID,
-                'score'         => $value['score'],
+                'score'         => toEngNumbers( $value['score'] ),
                 'title'         => $value['title'],
                 'type'          => $value['questionType'],
             ];  
@@ -436,6 +436,7 @@ class ExamController extends Controller
         if( !$insertedID )
             return false;
 
+        $index = 1;
         foreach ($questions as $value) 
         {
             $slaveTableData[]    = [
@@ -443,6 +444,7 @@ class ExamController extends Controller
                 'questionID'            => $value['id'],
                 'answer'                => 0,
                 'answerTime'            => 0,
+                'number'                => $index++
             ];
         }
         $resultOfMultiInsert    = DB::table('scores_detail')->insert($slaveTableData);
@@ -519,7 +521,7 @@ class ExamController extends Controller
     private function getQuestionsByDraftDetailID( $draftDetailID )
     {
         $questionID             = $this->getQuestionsIDByDraftDetailID($draftDetailID);
-        
+
         $questionsMasterDetails = DB::table('questions')->
         join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->select('questions.*')->
         where([ 
