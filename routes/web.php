@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
      */
     Route::get('/courses', [ CourseController::class, 'index' ])->name('courses');
     Route::get('/exams/{id}', [ ExamController::class, 'examsOfAClass' ])->name('examsOfACourse');
+    Route::get('/exam/result/{examID}', [ ExamController::class, 'showResultOfExam' ])->name('examResult');
     Route::get('/attendance/{examID}', [ ExamController::class, 'attendance' ])->name('attendance');
     Route::get('/attendance/{examID}/{questionID}', [ ExamController::class, 'attendance' ])->name('attendanceWithQuestion');
     Route::post('/attendance/answer/{questionID}/{moveType?}', [ ExamController::class, 'updateExamQuestionResult' ])->name('updateExamQuestion');
@@ -129,7 +130,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [ UserController::class, 'users' ])->name('users');
         Route::get('/user/add', [ UserController::class, 'addUser' ])->name('addUser');
-        Route::get('/user/insert', [ UserController::class, 'insertUser' ])->name('insertUser');
+        Route::post('/user/insert', [ UserController::class, 'insertUser' ])->name('insertUser');
         Route::get('/user/edit/{id}', [ UserController::class, 'editUser' ])->name('editUser');
         Route::get('/user/delete/{id}', [ UserController::class, 'deleteUser' ])->name('deleteUser');
         Route::post('/user/update/{id}', [ UserController::class, 'updateUser' ])->name('updateUser');

@@ -38,9 +38,11 @@ class ExamController extends Controller
         join('courses', 'courses.id', '=', 'classes.courseID')->
         join('semesters', 'semesters.id', '=', 'classes.semesterID')->
         join('scores', 'scores.examID', '=', 'exams.id')->
+        join('assignees', 'assignees.classID', '=', 'exams.classID')->
         select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle','scores.timeFinish as timeFinishedDate' ])->
         where([ 
             [ 'classes.id', '=', $classID ], 
+            [ 'assignees.studentID', '=', Auth::user()->id ], 
             [ 'classes.trash', '<>', trashed() ], 
             [ 'courses.trash', '<>', trashed() ], 
             [ 'users.trash', '<>', trashed() ], 
@@ -49,7 +51,7 @@ class ExamController extends Controller
 
         return view('pages.exams.general', $params);
     }
-    
+
     public function adminExams()
     {
         $params['exams'] =  DB::table('exams')->
@@ -107,13 +109,40 @@ class ExamController extends Controller
 
     public function addQuestions($examID)
     {
-        
-    
         $params     = [
             'questions'     => $this->getQuestionsByExamID( $examID ) ?? [],
             'examID'        => $examID,
         ];
         return view('pages.exams.addQuestions', $params);
+    }
+
+
+    
+    public function showResultOfExam($examID)
+    {
+        $params     = [
+            'questions'     => $this->getQuestionsByExamID( $examID ) ?? [],
+            'examID'        => $examID,
+            'scores'        => $this->assocArrayOfScores( $examID ),
+        ];
+        return view('pages.exams.result', $params);
+    }
+
+    private function assocArrayOfScores( $examID )
+    {
+        $result     = [];
+        $scores     = DB::table('scores')->
+        join('scores_detail', 'scores.id', '=', 'scores_detail.scoreID')
+        ->select('scores_detail.*')
+        ->where([ 
+            ['scores.examID', '=', $examID],
+            ['scores.trash', '<>', trashed()],
+            ['scores_detail.trash', '<>', trashed()],
+        ])->get()->toArray();
+
+        foreach ($scores as $value)
+            $result[ $value->questionID ] = $value->answer;
+        return $result;
     }
 
     private function buildFakeOptionData($inp)
