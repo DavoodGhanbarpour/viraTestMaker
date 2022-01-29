@@ -3,6 +3,15 @@
         <div class="card">
             <div class="card-body" >
                 <div class="col-12">
+                    <div class="card-body border-bottom py-3">
+                        <div class="d-flex">
+                            <div class="ms-auto ">
+                                <a href="{{ route('addUser') }}" class="btn bg-teal w-100">
+                                    افزودن
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-vcenter table-mobile-md card-table">
                             <thead>

@@ -52,6 +52,47 @@ class UserController extends Controller
     }
 
 
+    public function addUser( )
+    {
+        return view('pages.users.add');
+    } 
+    
+    public function insertUser( Request $request )
+    {
+        $inputs         = $request->input();
+        $path           = null;
+        if ( $request->hasFile('photo') ) 
+            if( $request->file('photo')->isValid() )
+                $path = str_replace( 'public/', '/', $request->file('photo')->store('public/avatars') );
+            else
+                return back()->with('flashMessage',messageErrors( 406 ) );
+
+        $dataToUpdate   = [
+            'username'      => $inputs['username'],
+            'email'         => $inputs['email'],
+            'name'          => $inputs['fullName'],
+            'role'          => $inputs['role'] ?? 'STUDENT',
+            'phoneNumber'   => $inputs['phoneNumber'] ,
+        ];
+        if( $path !== null )
+            $dataToUpdate['avatar']         = $path;
+
+        if( $inputs['password'] )
+            $dataToUpdate['password']       = Hash::make( $inputs['password'] );
+
+        $insertedID     = DB::table('users')->insertGetId($dataToUpdate);
+
+
+
+
+        if( $insertedID )
+            return redirect('/users')->with('flashMessage', messageErrors( 200 ) );
+        else
+            return back()->with('flashMessage',messageErrors( 402 ) );
+    }
+
+
+
     public function deleteUser( $id )
     {
         if( Auth::user()->id == $id )

@@ -58,11 +58,6 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label required">تعداد مجاز شرکت در آزمون</label>
-                                    <input type="text" class="form-control rtl" name="timesToTry" required autocomplete="off"
-                                        value="{{$exam->timesToTry}}"/>
-                                </div>
-                                <div class="mb-3">
                                     <label class="form-label required">چیدمان تصادفی سوالات و گزینه ها</label>
                                     <select class="form-control rtl" name="random">
                                         @php
@@ -75,21 +70,6 @@
                                         @endphp
                                         <option {{$trueSelected}} value="TRUE">فعال</option>
                                         <option {{$falseSelected}} value="FALSE">غیرفعال</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label required">جا به جایی میان سوالات</label>
-                                    <select class="form-control rtl" name="move">
-                                        @php
-                                            $trueSelected   = '';
-                                            $falseSelected  = '';
-                                            if( $exam->isMoveAllowed == 'true' )
-                                                $trueSelected   = 'selected';
-                                            else
-                                                $falseSelected  = 'selected';
-                                        @endphp
-                                        <option value="TRUE">فعال</option>
-                                        <option value="FALSE">غیرفعال</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">

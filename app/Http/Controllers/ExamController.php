@@ -70,11 +70,21 @@ class ExamController extends Controller
 
     public function teacherExams()
     {
-        $params = [
-            'exams'       => DB::table('exams')->select('*')->where('trash', '<>', trashed())->get()->toArray(),
-        ];
-        
-        return view('pages.exams.teacher', $params);
+        $params['exams'] =  DB::table('exams')->
+        join('classes', 'classes.id', '=', 'exams.classID')->
+        join('users', 'users.id', '=', 'classes.teacherID')->
+        join('courses', 'courses.id', '=', 'classes.courseID')->
+        join('semesters', 'semesters.id', '=', 'classes.semesterID')->
+        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle' ])->
+        where([ 
+            [ 'classes.trash', '<>', trashed() ], 
+            [ 'courses.trash', '<>', trashed() ], 
+            [ 'users.trash', '<>', trashed() ], 
+            [ 'exams.trash', '<>', trashed() ], 
+            [ 'classes.teacherID', '=', Auth::user()->id ], 
+        ])->get()->toArray();
+               
+        return view('pages.exams.admin', $params);
     }
 
     public function studentExams()
@@ -253,11 +263,21 @@ class ExamController extends Controller
     }
 
     
-    public function deleteExam( $courseID )
+    public function deleteExam( $examID )
     {
-        $affected = DB::table('Exams')
-            ->where('id', '=' ,$courseID)
+        $affected = DB::table('exams')
+            ->where('id', '=' ,$examID)
             ->update([ 'trash' => trashed() ]);
+
+        $affected = DB::table('questions')
+        ->where('examID', '=' ,$examID)
+        ->update([ 'trash' => trashed() ]);
+
+        
+        $affected = DB::table('questions')
+        ->where('examID', '=' ,$examID)
+        ->update([ 'trash' => trashed() ]);
+
 
         if( $affected )
             return back()->with('flashMessage', messageErrors( 200 ) );
