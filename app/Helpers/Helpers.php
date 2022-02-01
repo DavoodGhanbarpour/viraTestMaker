@@ -21,6 +21,7 @@
             '411'       => [ 'type' => 'danger', 'message' => 'آزمون شناخته نشد' ],
             '412'       => [ 'type' => 'danger', 'message' => 'خطا در ثبت آزمون' ],
             '413'       => [ 'type' => 'danger', 'message' => 'قبلا در آزمون شرکت کرده اید' ],
+            '414'       => [ 'type' => 'danger', 'message' => 'زمان آزمون به پایان رسیده است' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];
@@ -124,33 +125,21 @@
     function datepickerToTimestamp($datePickerValue)
     {
         $jalaliString   = toEngNumbers( $datePickerValue );
-        return \Morilog\Jalali\CalendarUtils::createDatetimeFromFormat('Y/m/d', $jalaliString )->getTimestamp();
+        return \Morilog\Jalali\CalendarUtils::createDatetimeFromFormat('Y/m/d', $jalaliString, 'UTC' )->getTimestamp();
     }   
     
     
     function timestampTHours($timestamp)
     {
-        return gmdate("H:i",$timestamp);   
+        return date("H:i",$timestamp);   
     }
 
 
     function timepickerToTimestamp($timepickerValue)
     {
-        $minuts         = 0;
         $jalaliString   = toEngNumbers( $timepickerValue );
-        $explodedString = explode( ':', $jalaliString);
-        if( $explodedString[0] == 0 && $explodedString[1] == 0 )
-        {
-            $explodedString[0] = 24;
-            $explodedString[1] = 0;
-        }
-
-        $minuts         += ( int ) $explodedString[0] * 60; 
-        $minuts         += ( int ) $explodedString[1]; 
-
-        return $minuts * 60; 
+        return strtotime( $jalaliString ) % 86400;
     }
-
 
     function timestampToJalali($timestamp)
     {

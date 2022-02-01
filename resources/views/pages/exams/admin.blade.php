@@ -70,7 +70,7 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ timestampTHours($eachExam->timeFinish - $eachExam->timeStart) }}</div>
+                                                <div class="font-weight-medium">{{ gmdate('H:i',$eachExam->timeFinish - $eachExam->timeStart) }}</div>
                                             </div>
                                         </div>
                                     </td>

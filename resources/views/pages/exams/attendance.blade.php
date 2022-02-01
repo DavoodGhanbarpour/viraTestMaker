@@ -9,7 +9,19 @@
                             <div class="col-5">
                                 <fieldset class="form-fieldset">
                                     <div class="mb-3">
-                                        <h3 class="text-muted">سوال یک :</h3>
+                                        <div class="row">
+                                            <div class="col-5">
+                                                <h3 class="text-muted">سوال یک :</h3>
+                                            </div>
+                                            <div class="col-7 justify-content-end d-flex">
+                                                <h5> 
+                                                    <span class="text-muted">زمان باقی مانده : </span>
+                                                    <span>
+                                                        {{ gmdate('H:i:s', $examDetails->timeFinish - ( time() % 86400 ) ) }}
+                                                    </span>
+                                                </h5>
+                                            </div>
+                                        </div>
                                         <label class="form-label">{{ $questionsDetails['master']->title }}</label> 
                                     </div>
                                     <hr>

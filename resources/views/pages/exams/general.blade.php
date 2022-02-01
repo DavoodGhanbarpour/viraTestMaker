@@ -61,7 +61,7 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ timestampTHours($eachExam->timeFinish - $eachExam->timeStart) }}</div>
+                                                <div class="font-weight-medium">{{ gmdate('H:i',$eachExam->timeFinish - $eachExam->timeStart) }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -74,15 +74,12 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            @if ( !$eachExam->timeFinishedDate )
                                                 <a class="btn btn-info btn-sm" href="{{route('attendance',['examID'=>$eachExam->id])}}">
                                                     شرکت در آزمون
                                                 </a> 
-                                            @else
                                                 <a class="btn btn-info btn-sm" >
                                                     مشاهده نمره
                                                 </a> 
-                                            @endif
                                         </div>
                                     </td>
                                 </tr>

@@ -37,18 +37,18 @@ class ExamController extends Controller
         join('users', 'users.id', '=', 'classes.teacherID')->
         join('courses', 'courses.id', '=', 'classes.courseID')->
         join('semesters', 'semesters.id', '=', 'classes.semesterID')->
-        join('scores', 'scores.examID', '=', 'exams.id')->
         join('assignees', 'assignees.classID', '=', 'exams.classID')->
-        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle','scores.timeFinish as timeFinishedDate' ])->
+        select([ 'users.name as teacherName', 'courses.title as courseTitle', 'exams.*', 'classes.title as classTitle', 'semesters.title as semesterTitle' ])->
         where([ 
             [ 'classes.id', '=', $classID ], 
             [ 'assignees.studentID', '=', Auth::user()->id ], 
+            [ 'assignees.trash', '<>', trashed() ], 
             [ 'classes.trash', '<>', trashed() ], 
             [ 'courses.trash', '<>', trashed() ], 
             [ 'users.trash', '<>', trashed() ], 
             [ 'exams.trash', '<>', trashed() ], 
         ])->get()->toArray();
-
+            
         return view('pages.exams.general', $params);
     }
 
@@ -421,6 +421,10 @@ class ExamController extends Controller
     {
         
         $examDetails        = $this->getExamDetail($examID);
+        
+        if( $examDetails->timeFinish + $examDetails->dateFinish <= time() ) 
+            return back()->with('flashMessage', messageErrors( 414 ) );
+
         $wasExamFinished    = $this->isUserHadFinishExam($examID);
         if( $wasExamFinished )
             return back()->with('flashMessage', messageErrors( 413 ) );
@@ -453,9 +457,12 @@ class ExamController extends Controller
 
         if( $hasDraft )
         {
-            $params['isLastQuestion']    = $this->isLastQuestion( $hasDraft, $questionDetails['master']->id );
-            $params['isFirstQuestion']   = $this->isFirstQuestion( $hasDraft, $questionDetails['master']->id );
+            $params['isLastQuestion']       = $this->isLastQuestion( $hasDraft, $questionDetails['master']->id );
+            $params['isFirstQuestion']      = $this->isFirstQuestion( $hasDraft, $questionDetails['master']->id );
+            $params['draftDetail']          = $this->getDraftData( $hasDraft );
         }
+
+
 
         return view('pages.exams.attendance', $params);
     }
@@ -513,6 +520,24 @@ class ExamController extends Controller
         
         if( $isAvailable )
             return $isAvailable->id;
+        else
+            return false;
+    }
+
+
+    
+    private function getDraftData($draftID)
+    {
+        $isAvailable = DB::table('scores')->
+        select([ '*' ])->
+        where([ 
+            [ 'id', '=', $draftID ],
+            [ 'studentID', '=', Auth::user()->id ],
+            [ 'trash', '<>', trashed() ],
+        ])->get()->first();
+        
+        if( $isAvailable )
+            return $isAvailable;
         else
             return false;
     }
