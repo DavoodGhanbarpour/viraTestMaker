@@ -107,6 +107,35 @@ class ExamController extends Controller
         return view('pages.exams.add', $params);
     }
 
+    public function addScore( $examID )
+    {
+        $params     = [
+            'questions'     => $this->getTextareaQuestionsByExamID( $examID ) ?? [],
+            'examID'        => $examID,
+        ];
+
+        if( !$params['questions'] )
+            return back()->with('flashMessage',messageErrors( 415 ) );
+
+        return view('pages.exams.scoreExams', $params);
+    }
+
+
+    
+    public function insertScore( Request $request,$examID )
+    {
+        die('adssdaads');
+        $params     = [
+            'questions'     => $this->getTextareaQuestionsByExamID( $examID ) ?? [],
+            'examID'        => $examID,
+        ];
+
+        if( !$params['questions'] )
+            return back()->with('flashMessage',messageErrors( 415 ) );
+
+        return view('pages.exams.scoreExams', $params);
+    }
+
     public function addQuestions($examID)
     {
         $params     = [
@@ -204,7 +233,7 @@ class ExamController extends Controller
                 }
                 $questionsSlave[]   = [
                     'questionID'    => $insertedID,
-                    'title'         => $title,
+                    'title'         => $title ?? '',
                     'correctAnswer' => $isCorrectAnswer, 
                 ];
             }
@@ -421,7 +450,7 @@ class ExamController extends Controller
     {
         
         $examDetails        = $this->getExamDetail($examID);
-        
+
         if( $examDetails->timeFinish + $examDetails->dateFinish <= time() ) 
             return back()->with('flashMessage', messageErrors( 414 ) );
 
@@ -671,6 +700,57 @@ class ExamController extends Controller
 
         return $groupedQuestinos;
     }
+
+    private function getTextareaQuestionsByExamID( $examID )
+    {
+        $groupedQuestinos  = [];
+        $questions         = DB::table('questions')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
+        join('exams', 'exams.id', '=', 'questions.examID')->
+        select([ 
+            'questions.*',
+            'questions.title as questionsTitle',
+            'questions.id as masterID',
+            'questions_detail.correctAnswer',
+            'questions_detail.title as optionTitle',
+            'questions.examID',
+            'questions_detail.questionID',
+            'questions_detail.id as slaveID' 
+        ])->
+        where([ 
+            [ 'exams.id', '=', $examID ], 
+            [ 'questions.type', '=', 'description' ], 
+            [ 'questions.trash', '<>', trashed() ], 
+            [ 'questions_detail.trash', '<>', trashed() ], 
+        ])->get()->toArray();
+        
+
+        foreach ($questions as $value) 
+        {
+            $groupedQuestinos[ $value->questionID ]['id']               = $value->id;
+            $groupedQuestinos[ $value->questionID ]['title']            = $value->questionsTitle;
+            $groupedQuestinos[ $value->questionID ]['score']            = $value->score;
+            $groupedQuestinos[ $value->questionID ]['questionType']     = $value->type;
+
+            if(  $value->type == 'multiOption' )
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption']    = $this->buildFakeOptionData('multiOption');
+
+            if(  $value->type == 'trueFalse' )
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase'][]    = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase']      = $this->buildFakeOptionData('trueFalse');
+
+            if(  $value->type == 'description' )
+                $groupedQuestinos[ $value->questionID ]['slavesDescription'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesDescription']    = $this->buildFakeOptionData('description');
+        }
+
+        return $groupedQuestinos;
+    }
+
 
 
     private function getQuestionsByDraftDetailID( $draftDetailID )

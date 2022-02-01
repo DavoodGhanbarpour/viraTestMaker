@@ -22,6 +22,7 @@
             '412'       => [ 'type' => 'danger', 'message' => 'خطا در ثبت آزمون' ],
             '413'       => [ 'type' => 'danger', 'message' => 'قبلا در آزمون شرکت کرده اید' ],
             '414'       => [ 'type' => 'danger', 'message' => 'زمان آزمون به پایان رسیده است' ],
+            '415'       => [ 'type' => 'danger', 'message' => 'امکان ثبت نمره فقط برای آزمون های شامل سوال تشریحی میباشد' ],
         ];
 
         return $arrayOfErrors[ $codeOfError ];

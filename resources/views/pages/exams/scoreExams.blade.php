@@ -3,6 +3,8 @@
         <div class="card">
             <div class="card-body" >
                 <div class="col-12">
+                    <form action="{{route('insertScore',[ 'examID' => $examID ])}}"  method="post" >
+                        @csrf
                         <div class="my-2 row fix-header" >
                             <div class="col-1 text-center">
                                 <label for="">ردیف</label>
@@ -140,7 +142,7 @@
                                     </div>
 
                                     <div class="col-1 text-center">
-                                        <label>1</label>
+                                        <input type="text" class="form-control scoreForCorrectItems" value="0" name="scoreForCorrectItems[{{ $eachQuestion['id'] }}]">
                                     </div>
                             </div>
                             @endforeach
@@ -149,9 +151,11 @@
                         <div class="d-flex justify-content-end">
                             <div class="form-footer">
                                 <x-cancel-button/>
+                                <x-submit-button/>
                             </div>
                         </div>
                     </div>
+                </form>
             </div>
         </div>
 @endsection
@@ -220,6 +224,30 @@ $(document).ready(function () {
                 break;
         }
     }
+
+
+    $(document).on('keyup', '.scoreForCorrectItems', function(){
+        var baseScore   = parseFloat( $(this).parent().parent().find('input[name=score]').val() );
+        var thisVal     = parseFloat( toEnglishDigits( $(this).val() ) );
+        
+        if( thisVal > baseScore )
+            $(this).val( baseScore );
+    });
+
+
+    
+
+function toEnglishDigits(str) {
+  const persianNumbers = ["۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹", "۰"]
+  const arabicNumbers = ["١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩", "٠"]
+  const englishNumbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+  
+  return str.split("").map(c => englishNumbers[persianNumbers.indexOf(c)] ||
+      englishNumbers[arabicNumbers.indexOf(c)] || c).join("")
+}
+
+
+
 </script>
 @endsection
 

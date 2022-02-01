@@ -242,7 +242,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-3 questionsTypeSection d-none" data-question-type="description">
+                                        {{-- <div class="col-3 questionsTypeSection d-none" data-question-type="description">
                                             <div class="row">
                                                 <div class="col-2">
                                                     &nbsp;
@@ -251,7 +251,7 @@
                                                     <textarea class="form-control" name="answer" rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> --}}
 
                                     <div class="col-1 text-center">
                                         <a class="btn btn-danger" data-repeater-delete>
