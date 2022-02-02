@@ -3,6 +3,7 @@
         <div class="card">
             <div class="card-body" >
                 <div class="col-12">
+                    جمع نمرات اخذ شده : {{$totalScoreOfUser}}
                         <div class="my-2 row fix-header" >
                             <div class="col-1 text-center">
                                 <label for="">ردیف</label>
@@ -140,7 +141,7 @@
                                     </div>
 
                                     <div class="col-1 text-center">
-                                        <label>1</label>
+                                        <label>{{$eachQuestion['slavesDescription'][0]->scoreIfCorrect??$eachQuestion['slavesTrueFlase'][0]->scoreIfCorrect??$eachQuestion['slavesMultiOption'][0]->scoreIfCorrect??'0'}}</label>
                                     </div>
                             </div>
                             @endforeach

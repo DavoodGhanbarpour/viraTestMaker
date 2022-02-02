@@ -204,29 +204,26 @@ class ExamController extends Controller
     public function showResultOfExam($examID)
     {
         $params     = [
-            'questions'     => $this->getQuestionsByExamID( $examID ) ?? [],
-            'examID'        => $examID,
-            'scores'        => $this->assocArrayOfScores( $examID ),
+            'questions'         => $this->getQuestionsResultByExamID( $examID, Auth::user()->id ) ?? [],
+            'examID'            => $examID,
+            'totalScoreOfUser'  => $this->sumOfScoresAchived( $examID, Auth::user()->id )
         ];
+        
         return view('pages.exams.result', $params);
     }
 
-    private function assocArrayOfScores( $examID )
+    private function sumOfScoresAchived($examID, $studentID)
     {
-        $result     = [];
-        $scores     = DB::table('scores')->
-        join('scores_detail', 'scores.id', '=', 'scores_detail.scoreID')
-        ->select('scores_detail.*')
-        ->where([ 
-            ['scores.examID', '=', $examID],
-            ['scores.trash', '<>', trashed()],
-            ['scores_detail.trash', '<>', trashed()],
-        ])->get()->toArray();
-
-        foreach ($scores as $value)
-            $result[ $value->questionID ] = $value->answer;
-        return $result;
+        return DB::table('scores_detail')->
+        join('scores', 'scores.id', '=', 'scores_detail.scoreID')->
+        where([
+            [ 'studentID', '=' ,$studentID ],
+            [ 'scores.examID', '=' ,$examID ],
+            [ 'scores.trash', '<>' ,trashed() ],
+            [ 'scores_detail.trash', '<>' ,trashed() ],
+        ])->sum('scoreIfCorrect') ?? 0;
     }
+
 
     private function buildFakeOptionData($inp)
     {
@@ -820,6 +817,61 @@ class ExamController extends Controller
             [ 'exams.id', '=', $examID ], 
             [ 'scores.studentID', '=', $studentID ], 
             [ 'questions.type', '=', 'description' ], 
+            [ 'questions.trash', '<>', trashed() ], 
+            [ 'scores_detail.trash', '<>', trashed() ], 
+            [ 'questions_detail.trash', '<>', trashed() ], 
+        ])->get()->toArray();
+        
+
+        foreach ($questions as $value) 
+        {
+            $groupedQuestinos[ $value->questionID ]['id']               = $value->id;
+            $groupedQuestinos[ $value->questionID ]['title']            = $value->questionsTitle;
+            $groupedQuestinos[ $value->questionID ]['score']            = $value->score;
+            $groupedQuestinos[ $value->questionID ]['questionType']     = $value->type;
+
+            if(  $value->type == 'multiOption' )
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesMultiOption']    = $this->buildFakeOptionData('multiOption');
+
+            if(  $value->type == 'trueFalse' )
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase'][]    = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesTrueFlase']      = $this->buildFakeOptionData('trueFalse');
+
+            if(  $value->type == 'description' )
+                $groupedQuestinos[ $value->questionID ]['slavesDescription'][]  = $value;
+            else
+                $groupedQuestinos[ $value->questionID ]['slavesDescription']    = $this->buildFakeOptionData('description');
+        }
+
+        return $groupedQuestinos;
+    }
+
+
+    private function getQuestionsResultByExamID( $examID, $studentID )
+    {
+        $groupedQuestinos  = [];
+        $questions         = DB::table('questions')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
+        join('exams', 'exams.id', '=', 'questions.examID')->
+        join('scores', 'scores.examID', '=', 'exams.id')->
+        join('scores_detail', 'scores_detail.scoreID', '=', 'scores.id')->
+        select([ 
+            'questions.*',
+            'questions.title as questionsTitle',
+            'questions.id as masterID',
+            'questions_detail.correctAnswer',
+            'questions_detail.title as optionTitle',
+            'questions.examID',
+            'questions_detail.questionID',
+            'questions_detail.id as slaveID',
+            'scores_detail.scoreIfCorrect as scoreIfCorrect',
+        ])->
+        where([ 
+            [ 'exams.id', '=', $examID ], 
+            [ 'scores.studentID', '=', $studentID ], 
             [ 'questions.trash', '<>', trashed() ], 
             [ 'scores_detail.trash', '<>', trashed() ], 
             [ 'questions_detail.trash', '<>', trashed() ], 
