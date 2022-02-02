@@ -172,9 +172,19 @@ class ExamController extends Controller
     
     public function insertScore( Request $request,$examID, $studentID )
     {
-        die('adssdaads');
-
-
+        $requests = $request->input();
+        foreach ($requests['scoreForCorrectItems'] as $questionID => $score) 
+        {
+            $result = DB::table('scores_detail')->
+            join('scores', 'scores.id', '=', 'scores_detail.scoreID')
+            ->where([
+                [ 'questionID', '=' ,$questionID ],
+                [ 'studentID', '=' ,$studentID ],
+                [ 'scores.trash', '<>' ,trashed() ],
+                [ 'scores_detail.trash', '<>' ,trashed() ],
+            ])
+            ->update([ 'scoreIfCorrect' => $score ]);
+        }
 
 
         return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
@@ -186,7 +196,7 @@ class ExamController extends Controller
             'questions'     => $this->getQuestionsByExamID( $examID ) ?? [],
             'examID'        => $examID,
         ];
-        return view('pages.exams.addQuestions', $params);
+        return redirect('examsScoresByStudent')->with('flashMessage', messageErrors( 200 ) );
     }
 
 
@@ -794,6 +804,7 @@ class ExamController extends Controller
         join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
         join('exams', 'exams.id', '=', 'questions.examID')->
         join('scores', 'scores.examID', '=', 'exams.id')->
+        join('scores_detail', 'scores_detail.scoreID', '=', 'scores.id')->
         select([ 
             'questions.*',
             'questions.title as questionsTitle',
@@ -802,13 +813,15 @@ class ExamController extends Controller
             'questions_detail.title as optionTitle',
             'questions.examID',
             'questions_detail.questionID',
-            'questions_detail.id as slaveID' 
+            'questions_detail.id as slaveID',
+            'scores_detail.scoreIfCorrect as scoreIfCorrect',
         ])->
         where([ 
             [ 'exams.id', '=', $examID ], 
             [ 'scores.studentID', '=', $studentID ], 
             [ 'questions.type', '=', 'description' ], 
             [ 'questions.trash', '<>', trashed() ], 
+            [ 'scores_detail.trash', '<>', trashed() ], 
             [ 'questions_detail.trash', '<>', trashed() ], 
         ])->get()->toArray();
         

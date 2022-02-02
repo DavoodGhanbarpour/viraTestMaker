@@ -143,7 +143,7 @@
                                     </div>
 
                                     <div class="col-1 text-center">
-                                        <input type="text" class="form-control scoreForCorrectItems" value="0" name="scoreForCorrectItems[{{ $eachQuestion['id'] }}]">
+                                        <input type="text" class="form-control scoreForCorrectItems" value="{{$eachQuestion['slavesDescription'][0]->scoreIfCorrect??$eachQuestion['slavesTrueFlase'][0]->scoreIfCorrect??$eachQuestion['slavesMultiOption'][0]->scoreIfCorrect??'0'}}" name="scoreForCorrectItems[{{ $eachQuestion['id'] }}]">
                                     </div>
                             </div>
                             @endforeach

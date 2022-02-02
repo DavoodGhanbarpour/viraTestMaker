@@ -17,7 +17,7 @@ class ModifieScores extends Migration
             $table->dropColumn('scoreIfCorrect');
         });
         Schema::table('scores_detail', function (Blueprint $table) {
-            $table->integer('scoreIfCorrect');
+            $table->float('scoreIfCorrect');
         });
     }
 

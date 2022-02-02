@@ -14,7 +14,7 @@ class DefaultValueForScoreDetail extends Migration
     public function up()
     {
         Schema::table('scores_detail', function (Blueprint $table) {
-            $table->integer('scoreIfCorrect')->default(0)->change();
+            $table->float('scoreIfCorrect')->default(0)->change();
         });
     }
 
@@ -26,7 +26,7 @@ class DefaultValueForScoreDetail extends Migration
     public function down()
     {
         Schema::table('scores_detail', function (Blueprint $table) {
-            $table->integer('scoreIfCorrect');
+            $table->float('scoreIfCorrect');
         });
     }
 }
