@@ -3,26 +3,16 @@
         <div class="card">
             <div class="card-body" >
                 <div class="col-12">
-                    <div class="card-body border-bottom py-3">
-                        <div class="d-flex">
-                            <div class="ms-auto ">
-                                <a href="{{ route('addExam') }}" class="btn bg-teal w-100">
-                                    افزودن
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                     <div class="table-responsive">
                         <table class="table table-vcenter table-mobile-md card-table">
                             <thead>
                             <tr>
-                                <th>عنوان</th>
-                                <th>درس</th>
-                                <th>استاد</th>
+                                <th>نام دانشجو</th>
                                 <th>تاریخ شروع</th>
                                 <th>تاریخ پایان</th>
                                 <th>مدت زمان</th>
-                                <th>امکان مرور</th>
+                                <th>نمره اخذ شده سیستمی</th>
+                                <th>وضعیت تصحیح</th>
                                 <th class="w-1"></th>
                             </tr>
                             </thead>
@@ -32,29 +22,14 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachExam->title }}</div>
+                                                <div class="font-weight-medium">{{ $eachExam->studentName }}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachExam->classTitle }}</div>
-                                                <div class="text-muted">{{ $eachExam->semesterTitle }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex py-1 align-items-center">
-                                            <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ $eachExam->teacherName }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex py-1 align-items-center">
-                                            <div class="flex-fill">
-                                                <div>{{ timestampToJalali( $eachExam->dateStart ) }}</div>
+                                                <div>{{ timestampToJalali( $eachExam->timeStart ) }}</div>
                                                 <div class="text-muted">{{ timestampTHours( $eachExam->timeStart ) }}</div>
                                             </div>
                                         </div>
@@ -62,7 +37,7 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div>{{ timestampToJalali( $eachExam->dateFinish ) }}</div>
+                                                <div>{{ timestampToJalali( $eachExam->timeFinish ) }}</div>
                                                 <div class="text-muted">{{ timestampTHours( $eachExam->timeFinish ) }}</div>
                                             </div>
                                         </div>
@@ -77,25 +52,22 @@
                                     <td>
                                         <div class="d-flex py-1 align-items-center">
                                             <div class="flex-fill">
-                                                <div class="font-weight-medium">{{ trueFalseTitle($eachExam->isReviewAllowed) }}</div>
+                                                <div class="font-weight-medium">{{ $eachExam->sumOfCorrectScores }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                 
+                                    <td>
+                                        <div class="d-flex py-1 align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="font-weight-medium">{{ !$eachExam->hasDescriptionQuestionWithoutAnswer ? 'نیاز به تصحیح ندارد' : 'نیاز به تصحیح دارد' ; }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
-                                            <a class="btn btn-warning btn-sm" href="{{route('addQuestions',['id'=>$eachExam->id])}}">
-                                                افزودن سوالات
-                                            </a>
-                                            <a class="btn btn-info btn-sm" href="{{route('editExam',['id'=>$eachExam->id])}}">
-                                                ویرایش
-                                            </a>
-                                            <a class="btn btn-info btn-sm" href="{{route('examsScoresByStudent',['examID'=>$eachExam->id])}}">
-                                               نتایج آزمون
-                                            </a>
-                                            <a class="btn btn-danger btn-sm" href="{{route('deleteExam',['id'=>$eachExam->id])}}">
-                                                حذف
-                                            </a>
+                                            <a class="btn btn-info btn-sm" href="{{ route('addScore', [ 'examID' => $eachExam->id, 'studentID' => $eachExam->studentID ]) }}">
+                                                تصحیح آزمون
+                                            </a> 
                                         </div>
                                     </td>
                                 </tr>

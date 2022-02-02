@@ -70,6 +70,12 @@ Route::middleware(['auth'])->group(function () {
 
 
     /**
+     * Tickets
+     */
+
+        Route::get('/tickets', [ ClassController::class, 'index' ])->name('classes');
+
+    /**
      * Classes
      */
 
@@ -87,14 +93,15 @@ Route::middleware(['auth'])->group(function () {
      */
 
         Route::get('/exams', [ ExamController::class, 'index' ])->name('exams');
+        Route::get('/exam/scores/{examID}', [ ExamController::class, 'examsScoresByStudent' ])->name('examsScoresByStudent');
         Route::get('/exam/add', [ ExamController::class, 'addExam' ])->name('addExam');
-        Route::get('/exam/score/{examID}', [ ExamController::class, 'addScore' ])->name('addScore');
+        Route::get('/exam/score/{examID}/{studentID}', [ ExamController::class, 'addScore' ])->name('addScore');
         Route::get('/exam/questions/{id}', [ ExamController::class, 'addQuestions' ])->name('addQuestions');
         Route::get('/exam/edit/{id}', [ ExamController::class, 'editExam' ])->name('editExam');
         Route::get('/exam/delete/{id}', [ ExamController::class, 'deleteExam' ])->name('deleteExam');
         Route::post('/exam/insert', [ ExamController::class, 'insertExam' ])->name('insertExam');
         Route::post('/exam/insertQuestions/{id}', [ ExamController::class, 'insertQuestions' ])->name('insertQuestions');
-        Route::post('/exam/score/insertScore/{examID}', [ ExamController::class, 'insertScore' ])->name('insertScore');
+        Route::post('/exam/score/insertScore/{examID}/{studentID}', [ ExamController::class, 'insertScore' ])->name('insertScore');
         Route::post('/exam/update/{id}', [ ExamController::class, 'updateExam' ])->name('updateExam');
 
 

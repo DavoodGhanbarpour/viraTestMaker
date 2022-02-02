@@ -3,7 +3,8 @@
         <div class="card">
             <div class="card-body" >
                 <div class="col-12">
-                    <form action="{{route('insertScore',[ 'examID' => $examID ])}}"  method="post" >
+                    دانشجو :‌ {{$studentName}}
+                    <form action="{{route('insertScore',[ 'examID' => $examID, 'studentID' => $studentID ])}}"  method="post" >
                         @csrf
                         <div class="my-2 row fix-header" >
                             <div class="col-1 text-center">

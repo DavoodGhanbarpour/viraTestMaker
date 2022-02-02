@@ -30,6 +30,52 @@ class ExamController extends Controller
     }
 
 
+    public function examsScoresByStudent($examID)
+    {
+        $params['exams'] =  DB::table('exams')->
+        join('assignees', 'assignees.classID', '=', 'exams.classID')->
+        join('users', 'assignees.studentID', '=', 'users.id')->
+        join('scores', 'scores.examID', '=', 'exams.id')->
+        join('scores_detail', 'scores_detail.scoreID', '=', 'scores.id')->
+        select([ 'scores.timeStart', 'scores.timeFinish', 'users.name as studentName', 'exams.id', 'users.id as studentID' ])->
+        selectRaw('SUM(scoreIfCorrect) as sumOfCorrectScores')->
+        where([ 
+            [ 'exams.id', '=', $examID ], 
+            [ 'assignees.trash', '<>', trashed() ], 
+            [ 'users.trash', '<>', trashed() ], 
+            [ 'exams.trash', '<>', trashed() ], 
+            [ 'scores.trash', '<>', trashed() ], 
+            [ 'scores_detail.trash', '<>', trashed() ], 
+            [ 'scores.timeFinish', '<>', '0' ], 
+        ])->groupBy('scores.studentID')->get()->toArray();
+
+        foreach ($params['exams'] as &$value) 
+            $value->hasDescriptionQuestionWithoutAnswer = $this->hasDescriptionQuestionWithoutAnswer($examID,$value->studentID);
+
+        return view('pages.exams.studentsResults', $params);
+    }
+
+    private function hasDescriptionQuestionWithoutAnswer($examID,$studentID)
+    {
+        $result =  DB::table('scores')->
+        join('scores_detail', 'scores_detail.scoreID', '=', 'scores.id')->
+        join('questions', 'questions.id', '=', 'scores_detail.questionID')->
+        where([ 
+            [ 'scores_detail.trash', '<>', trashed() ], 
+            [ 'scores_detail.scoreIfCorrect', '=', '0' ], 
+            [ 'scores.trash', '<>', trashed() ], 
+            [ 'scores.examID', '=', $examID ], 
+            [ 'scores.studentID', '=', $studentID ], 
+            [ 'questions.trash', '<>', trashed() ], 
+            [ 'questions.type', '=', 'description' ], 
+        ])->get()->first();
+
+        if( $result )  
+            return true;
+        else
+            return false;
+    }
+
     public function examsOfAClass($classID)
     {
         $params['exams'] =  DB::table('exams')->
@@ -107,11 +153,13 @@ class ExamController extends Controller
         return view('pages.exams.add', $params);
     }
 
-    public function addScore( $examID )
+    public function addScore( $examID, $studentID )
     {
         $params     = [
-            'questions'     => $this->getTextareaQuestionsByExamID( $examID ) ?? [],
+            'questions'     => $this->getTextareaQuestionsByExamID( $examID, $studentID ) ?? [],
             'examID'        => $examID,
+            'studentID'     => $studentID,
+            'studentName'   => DB::table('users')->select('name')->where('id','=',$studentID)->get()->first()->name,
         ];
 
         if( !$params['questions'] )
@@ -122,18 +170,14 @@ class ExamController extends Controller
 
 
     
-    public function insertScore( Request $request,$examID )
+    public function insertScore( Request $request,$examID, $studentID )
     {
         die('adssdaads');
-        $params     = [
-            'questions'     => $this->getTextareaQuestionsByExamID( $examID ) ?? [],
-            'examID'        => $examID,
-        ];
 
-        if( !$params['questions'] )
-            return back()->with('flashMessage',messageErrors( 415 ) );
 
-        return view('pages.exams.scoreExams', $params);
+
+
+        return redirect('/exams')->with('flashMessage', messageErrors( 200 ) );
     }
 
     public function addQuestions($examID)
@@ -279,10 +323,13 @@ class ExamController extends Controller
         $affected = DB::table('scores_detail')
         ->where('questionID', '=' ,$draftQuestionID)
         ->where('trash', '<>' ,trashed())
-        ->update([ 'answer' => $inputs['correctAnswer'], 'answerTime' => time() ]);
+        ->update([ 'answer' => $inputs['correctAnswer'], 'answerTime' => time(),
+            'scoreIfCorrect' => $this->getScoreOfQuestion( $inputs['correctAnswer'] )
+        ]);
 
         if( $moveType == 'finish' )
-            return $this->finishExam( $examData->examID );
+            if( $this->finishExam( $examData->examID ) )
+                return redirect('dashboard')->with('flashMessage',messageErrors( 200 ) );
 
 
         $nextOrPrevID = $this->nextOrPrevID( $examData->scoreDraftID , $examData->scoreMasterID );
@@ -297,6 +344,24 @@ class ExamController extends Controller
             return $this->attendance( $examData->examID, $questionToShow );
         else
             return back()->with('flashMessage',messageErrors( 412 ) );
+    }
+
+    private function getScoreOfQuestion ( $questionID )
+    {
+        $qeustionData =  DB::table('questions_detail')->
+        join('questions', 'questions.id', '=', 'questions_detail.questionID')->
+        select([ 'questions.score' ])->
+        where([ 
+            [ 'questions_detail.trash', '<>', trashed() ], 
+            [ 'questions.trash', '<>', trashed() ], 
+            [ 'questions_detail.id', '=', $questionID ], 
+            [ 'questions_detail.correctAnswer', '=', 'true' ],
+        ])->get()->first() ?? null;
+
+        if( $qeustionData->score )
+            return $qeustionData->score;
+        else 
+            return 0;
     }
 
     private function nextOrPrevID($scoreDetailID, $scoreID)
@@ -314,8 +379,8 @@ class ExamController extends Controller
         ->where('trash', '<>' ,trashed())
         ->update([ 'timeFinish' => time() ]);
 
-        if( $affected )
-            return redirect('dashboard')->with('flashMessage',messageErrors( 200 ) );
+        if( !$affected )
+            return true;
         else
             return back()->with('flashMessage',messageErrors( 412 ) );
     }
@@ -444,15 +509,36 @@ class ExamController extends Controller
         
     }
 
+    private function isExamHasFinishTime($examID)
+    {
+        $isFinish =  DB::table('scores')->
+        select([ 'scores.timeFinish' ])->
+        where([ 
+            [ 'scores.examID', '=', $examID ],
+            [ 'scores.trash', '<>', trashed() ],
+        ])->get()->first();
+        
+        if( $isFinish->timeFinish )
+            return true;
+        else
+            return false;
+    }
+
+
     
 
     public function attendance($examID, $questionToShowID = null)
     {
         
         $examDetails        = $this->getExamDetail($examID);
-
         if( $examDetails->timeFinish + $examDetails->dateFinish <= time() ) 
-            return back()->with('flashMessage', messageErrors( 414 ) );
+        {
+            if( !$this->isExamHasFinishTime($examID) )
+                if( $this->finishExam( $examID ) )
+                    return back()->with('flashMessage', messageErrors( 414 ) );
+            else
+                return back()->with('flashMessage', messageErrors( 413 ) );
+        }
 
         $wasExamFinished    = $this->isUserHadFinishExam($examID);
         if( $wasExamFinished )
@@ -701,12 +787,13 @@ class ExamController extends Controller
         return $groupedQuestinos;
     }
 
-    private function getTextareaQuestionsByExamID( $examID )
+    private function getTextareaQuestionsByExamID( $examID, $studentID )
     {
         $groupedQuestinos  = [];
         $questions         = DB::table('questions')->
         join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
         join('exams', 'exams.id', '=', 'questions.examID')->
+        join('scores', 'scores.examID', '=', 'exams.id')->
         select([ 
             'questions.*',
             'questions.title as questionsTitle',
@@ -719,6 +806,7 @@ class ExamController extends Controller
         ])->
         where([ 
             [ 'exams.id', '=', $examID ], 
+            [ 'scores.studentID', '=', $studentID ], 
             [ 'questions.type', '=', 'description' ], 
             [ 'questions.trash', '<>', trashed() ], 
             [ 'questions_detail.trash', '<>', trashed() ], 
@@ -791,9 +879,11 @@ class ExamController extends Controller
 
         // ---------------------------------------------------------------------------------------- //
         
-        $questionsSlaveDetails = DB::table('questions_detail')->select('*')->
+        $questionsSlaveDetails = DB::table('questions_detail')->select(['questions_detail.*','scores_detail.number'])->
+        join('scores_detail', 'questions_detail.questionID', '=', 'scores_detail.questionID')->
         where([ 
             [ 'questions_detail.questionID', '=', $questionsMasterDetails->id ],
+            [ 'scores_detail.trash', '<>', trashed() ],
             [ 'questions_detail.trash', '<>', trashed() ],
         ])->get()->toArray();
 

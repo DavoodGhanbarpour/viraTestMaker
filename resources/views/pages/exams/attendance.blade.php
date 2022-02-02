@@ -11,7 +11,7 @@
                                     <div class="mb-3">
                                         <div class="row">
                                             <div class="col-5">
-                                                <h3 class="text-muted">سوال یک :</h3>
+                                                <h3 class="text-muted">سوال {{ $questionsDetails['slaves'][0]->number }} :</h3>
                                             </div>
                                             <div class="col-7 justify-content-end d-flex">
                                                 <h5> 
