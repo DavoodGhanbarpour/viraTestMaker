@@ -61,7 +61,7 @@
                                                 @endphp 
                                                 <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="1"  {{$selected}}>
                                             </div>
-                                            <div class="col-10">
+                                            <div class="col-10"> 
                                                 <input type="text" class="form-control" disabled name="answer1" value="{{ $eachQuestion['slavesMultiOption'][0]->optionTitle }}" required >
                                             </div>
                                         </div>
