@@ -137,13 +137,13 @@
                                                 &nbsp;
                                             </div>
                                             <div class="col-10">
-                                                <textarea class="form-control" name="answer" disabled rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
+                                                <textarea class="form-control" name="answer" readonly rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-1 text-center">
-                                        <input type="text" class="form-control scoreForCorrectItems" value="{{$eachQuestion['slavesDescription'][0]->scoreIfCorrect??$eachQuestion['slavesTrueFlase'][0]->scoreIfCorrect??$eachQuestion['slavesMultiOption'][0]->scoreIfCorrect??'0'}}" name="scoreForCorrectItems[{{ $eachQuestion['id'] }}]">
+                                        <input type="text" class="form-control scoreForCorrectItems" value="{{ $assocArrayOfScores[ $eachQuestion['id'] ] ??'0'}}" name="scoreForCorrectItems[{{ $eachQuestion['id'] }}]">
                                     </div>
                             </div>
                             @endforeach

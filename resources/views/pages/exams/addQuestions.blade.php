@@ -242,16 +242,16 @@
                                             </div>
                                         </div>
 
-                                        {{-- <div class="col-3 questionsTypeSection d-none" data-question-type="description">
+                                        <div class="col-3 questionsTypeSection d-none" data-question-type="description">
                                             <div class="row">
                                                 <div class="col-2">
                                                     &nbsp;
                                                 </div>
                                                 <div class="col-10">
-                                                    <textarea class="form-control" name="answer" rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
+                                                    <textarea class="form-control" name="answer" disabled rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
                                                 </div>
                                             </div>
-                                        </div> --}}
+                                        </div>
 
                                     <div class="col-1 text-center">
                                         <a class="btn btn-danger" data-repeater-delete>
@@ -311,7 +311,7 @@
         var type =  rowSelector.val();
         rowSelector.parent().parent().find('.questionsTypeSection').addClass('d-none');
         rowSelector.parent().parent().find('.questionsTypeSection').find('input').prop('disabled',true);
-        rowSelector.parent().parent().find('.questionsTypeSection').find('textarea').prop('disabled',true);
+        rowSelector.parent().parent().find('.questionsTypeSection').find('textarea').prop('readonly',true);
 
         switch(type)
         {
@@ -329,7 +329,6 @@
 
             case 'description':
                 rowSelector.parent().parent().find('.questionsTypeSection[data-question-type=description]').removeClass('d-none');
-                rowSelector.parent().parent().find('.questionsTypeSection[data-question-type=description]').find('textarea').prop('disabled',false);
                 break;
 
 

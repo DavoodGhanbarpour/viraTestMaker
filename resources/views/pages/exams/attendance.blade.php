@@ -1,7 +1,7 @@
 @extends('base')
     @section('content')
         <div class="col-12">
-            <form action="{{route('updateExamQuestion',[ 'questionID' =>  $questionsDetails['master']->id ])}}" method="post" class="card" id="questionForm" enctype="multipart/form-data">
+            <form action="" method="post" class="card" id="questionForm" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                     <div class="row">
@@ -11,7 +11,7 @@
                                     <div class="mb-3">
                                         <div class="row">
                                             <div class="col-5">
-                                                <h3 class="text-muted">سوال {{ $questionsDetails['slaves'][0]->number }} :</h3>
+                                                <h3 class="text-muted">سوال {{ $questionNumbers[ $questionsDetails['slaves'][0]->questionID ] }} :</h3>
                                             </div>
                                             <div class="col-7 justify-content-end d-flex">
                                                 <h5> 
@@ -129,10 +129,11 @@
                 break;
         }
 
-        if ( confirm("آیا برای اتمام آزمون مطمئن میباشید؟") == false && moveType == 'finish') 
-            return;
+        if( moveType == 'finish' )
+            if ( confirm("آیا برای اتمام آزمون مطمئن میباشید؟") == false ) 
+                return;
 
-        lastAction = $('#questionForm').attr('action');
+        lastAction = '{{route('updateExamQuestion',[ 'questionID' =>  $questionsDetails['master']->id ])}}';
         $('#questionForm').attr('action', lastAction + '/' + moveType );
         $('#questionForm').submit();
     }

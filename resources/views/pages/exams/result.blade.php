@@ -30,7 +30,7 @@
                                 $index = 1;
                             @endphp
                             @foreach ($questions as $key => $eachQuestion)
-                            <div class="row px-1" data-repeater-item>
+                            <div class="row px-1 pt-3" data-repeater-item>
                                 <div class="col-1 text-center">
                                     @php
                                         echo $index++;
@@ -140,8 +140,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-1 text-center">
-                                        <label>{{$eachQuestion['slavesDescription'][0]->scoreIfCorrect??$eachQuestion['slavesTrueFlase'][0]->scoreIfCorrect??$eachQuestion['slavesMultiOption'][0]->scoreIfCorrect??'0'}}</label>
+                                    <div class="col-1 text-center d-flex align-items-center justify-content-center ">
+                                        <label>{{ $assocArrayOfScores[ $eachQuestion['id'] ] ??'0'}}</label>
                                     </div>
                             </div>
                             @endforeach

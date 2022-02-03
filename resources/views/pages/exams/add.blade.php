@@ -55,7 +55,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label required">چیدمان تصادفی سوالات و گزینه ها</label>
+                                    <label class="form-label required">چیدمان تصادفی سوالات</label>
                                     <select class="form-control rtl" name="random">
                                         <option value="TRUE">فعال</option>
                                         <option value="FALSE">غیرفعال</option>

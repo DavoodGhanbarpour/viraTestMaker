@@ -33,24 +33,22 @@ class ExamController extends Controller
     public function examsScoresByStudent($examID)
     {
         $params['exams'] =  DB::table('exams')->
-        join('assignees', 'assignees.classID', '=', 'exams.classID')->
-        join('users', 'assignees.studentID', '=', 'users.id')->
         join('scores', 'scores.examID', '=', 'exams.id')->
-        join('scores_detail', 'scores_detail.scoreID', '=', 'scores.id')->
+        join('users', 'scores.studentID', '=', 'users.id')->
         select([ 'scores.timeStart', 'scores.timeFinish', 'users.name as studentName', 'exams.id', 'users.id as studentID' ])->
-        selectRaw('SUM(scoreIfCorrect) as sumOfCorrectScores')->
         where([ 
             [ 'exams.id', '=', $examID ], 
-            [ 'assignees.trash', '<>', trashed() ], 
             [ 'users.trash', '<>', trashed() ], 
             [ 'exams.trash', '<>', trashed() ], 
             [ 'scores.trash', '<>', trashed() ], 
-            [ 'scores_detail.trash', '<>', trashed() ], 
             [ 'scores.timeFinish', '<>', '0' ], 
         ])->groupBy('scores.studentID')->get()->toArray();
 
         foreach ($params['exams'] as &$value) 
+        {
             $value->hasDescriptionQuestionWithoutAnswer = $this->hasDescriptionQuestionWithoutAnswer($examID,$value->studentID);
+            $value->sumOfCorrectScores                  = $this->sumOfScoresAchived($examID,$value->studentID);
+        }
 
         return view('pages.exams.studentsResults', $params);
     }
@@ -156,10 +154,11 @@ class ExamController extends Controller
     public function addScore( $examID, $studentID )
     {
         $params     = [
-            'questions'     => $this->getTextareaQuestionsByExamID( $examID, $studentID ) ?? [],
-            'examID'        => $examID,
-            'studentID'     => $studentID,
-            'studentName'   => DB::table('users')->select('name')->where('id','=',$studentID)->get()->first()->name,
+            'questions'         => $this->getTextareaQuestionsByExamID( $examID, $studentID ) ?? [],
+            'examID'            => $examID,
+            'studentID'         => $studentID,
+            'studentName'       => DB::table('users')->select('name')->where('id','=',$studentID)->get()->first()->name,
+            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, $studentID )
         ];
 
         if( !$params['questions'] )
@@ -196,7 +195,7 @@ class ExamController extends Controller
             'questions'     => $this->getQuestionsByExamID( $examID ) ?? [],
             'examID'        => $examID,
         ];
-        return redirect('examsScoresByStudent')->with('flashMessage', messageErrors( 200 ) );
+        return view('pages.exams.addQuestions', $params);
     }
 
 
@@ -206,10 +205,32 @@ class ExamController extends Controller
         $params     = [
             'questions'         => $this->getQuestionsResultByExamID( $examID, Auth::user()->id ) ?? [],
             'examID'            => $examID,
-            'totalScoreOfUser'  => $this->sumOfScoresAchived( $examID, Auth::user()->id )
+            'totalScoreOfUser'  => $this->sumOfScoresAchived( $examID, Auth::user()->id ),
+            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, Auth::user()->id )
         ];
-        
+        // dd($params);
         return view('pages.exams.result', $params);
+    }
+
+    
+    private function getScoresAsAssocArray( $examID, $studentID )
+    {
+        $result = [];
+        $arrays = DB::table('scores_detail')->
+        join('scores', 'scores.id', '=', 'scores_detail.scoreID')->
+        select([ 'scoreIfCorrect', 'questionID' ])->
+        where([ 
+            [ 'examID', '=', $examID ],
+            [ 'studentID', '=', $studentID ],
+            [ 'scores.trash', '<>', trashed() ],
+            [ 'scores_detail.trash', '<>', trashed() ],
+        ])->get()->toArray();
+
+        foreach ($arrays as $value) 
+            $result[ $value->questionID ] = $value->scoreIfCorrect ?? 0;
+
+        return $result;
+
     }
 
     private function sumOfScoresAchived($examID, $studentID)
@@ -250,7 +271,6 @@ class ExamController extends Controller
         $inputs             = $request->input(); 
         $questionsMaster    = [];
         $questionsSlave     = [];
-
         foreach ($inputs['examQuestions'] as $value) 
         {
             if( $value['lastQuestionID'] )
@@ -355,7 +375,7 @@ class ExamController extends Controller
 
     private function getScoreOfQuestion ( $questionID )
     {
-        $qeustionData =  DB::table('questions_detail')->
+        return DB::table('questions_detail')->
         join('questions', 'questions.id', '=', 'questions_detail.questionID')->
         select([ 'questions.score' ])->
         where([ 
@@ -363,12 +383,8 @@ class ExamController extends Controller
             [ 'questions.trash', '<>', trashed() ], 
             [ 'questions_detail.id', '=', $questionID ], 
             [ 'questions_detail.correctAnswer', '=', 'true' ],
-        ])->get()->first() ?? null;
+        ])->get()->first()->score ?? 0;
 
-        if( $qeustionData->score )
-            return $qeustionData->score;
-        else 
-            return 0;
     }
 
     private function nextOrPrevID($scoreDetailID, $scoreID)
@@ -382,11 +398,10 @@ class ExamController extends Controller
     private function finishExam( $examID )
     {
         $affected = DB::table('scores')
-        ->where('examID', '=' ,$examID)
-        ->where('trash', '<>' ,trashed())
+        ->where([ ['examID', '=' ,$examID], ['trash', '<>' ,trashed()], ['studentID', '=' ,Auth::user()->id] ])
         ->update([ 'timeFinish' => time() ]);
 
-        if( !$affected )
+        if( $affected )
             return true;
         else
             return back()->with('flashMessage',messageErrors( 412 ) );
@@ -404,9 +419,9 @@ class ExamController extends Controller
         ->update([ 'trash' => trashed() ]);
 
         
-        $affected = DB::table('questions')
-        ->where('examID', '=' ,$examID)
-        ->update([ 'trash' => trashed() ]);
+        // $affected = DB::table('questions_detail')
+        // ->where('examID', '=' ,$examID)
+        // ->update([ 'trash' => trashed() ]);
 
 
         if( $affected )
@@ -541,10 +556,12 @@ class ExamController extends Controller
         if( $examDetails->timeFinish + $examDetails->dateFinish <= time() ) 
         {
             if( !$this->isExamHasFinishTime($examID) )
+            {
                 if( $this->finishExam( $examID ) )
                     return back()->with('flashMessage', messageErrors( 414 ) );
+            }
             else
-                return back()->with('flashMessage', messageErrors( 413 ) );
+                return redirect('dashboard')->with('flashMessage', messageErrors( 413 ) );
         }
 
         $wasExamFinished    = $this->isUserHadFinishExam($examID);
@@ -582,11 +599,28 @@ class ExamController extends Controller
             $params['isLastQuestion']       = $this->isLastQuestion( $hasDraft, $questionDetails['master']->id );
             $params['isFirstQuestion']      = $this->isFirstQuestion( $hasDraft, $questionDetails['master']->id );
             $params['draftDetail']          = $this->getDraftData( $hasDraft );
+            $params['questionNumbers']      = $this->getNumberScoresAsAssocArray( $hasDraft );
         }
-
-
+// dd($params);
 
         return view('pages.exams.attendance', $params);
+    }
+
+    private function getNumberScoresAsAssocArray( $draftID )
+    {
+        $result = [];
+        $arrays = DB::table('scores_detail')->
+        select([ 'number', 'id', 'questionID' ])->
+        where([ 
+            [ 'scoreID', '=', $draftID ],
+            [ 'trash', '<>', trashed() ],
+        ])->get()->toArray();
+
+        foreach ($arrays as $value) 
+            $result[ $value->questionID ] = $value->number;
+
+        return $result;
+
     }
 
     private function isLastQuestion($draftID, $questionID)
@@ -701,7 +735,6 @@ class ExamController extends Controller
     {
         $questions              = $this->randomizeQuestionsIfNeeded( $examID, $this->getQuestionsByExamID( $examID ) );
         
-
         $masterTableData    = [
             'examID'        => $examID,
             'studentID'     => Auth::user()->id,
@@ -738,11 +771,8 @@ class ExamController extends Controller
         $isRandom          = $this->isExamRandom( $examID );
         if( !$isRandom ) 
             return $questions;
-        shuffle( $questions );
-        foreach ($questions as &$value) 
-            shuffle( $value['slavesMultiOption'] );
-
-        return $questions;
+        
+        return Arr::shuffle( $questions );;
     }
 
     private function getQuestionsByExamID( $examID )
@@ -856,8 +886,6 @@ class ExamController extends Controller
         $questions         = DB::table('questions')->
         join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
         join('exams', 'exams.id', '=', 'questions.examID')->
-        join('scores', 'scores.examID', '=', 'exams.id')->
-        join('scores_detail', 'scores_detail.scoreID', '=', 'scores.id')->
         select([ 
             'questions.*',
             'questions.title as questionsTitle',
@@ -867,13 +895,10 @@ class ExamController extends Controller
             'questions.examID',
             'questions_detail.questionID',
             'questions_detail.id as slaveID',
-            'scores_detail.scoreIfCorrect as scoreIfCorrect',
         ])->
         where([ 
             [ 'exams.id', '=', $examID ], 
-            [ 'scores.studentID', '=', $studentID ], 
             [ 'questions.trash', '<>', trashed() ], 
-            [ 'scores_detail.trash', '<>', trashed() ], 
             [ 'questions_detail.trash', '<>', trashed() ], 
         ])->get()->toArray();
         
@@ -935,20 +960,20 @@ class ExamController extends Controller
         $questionIDs            = $this->convertObjToSingleArray( $this->getQuestionsIDByDraftID($draftID) );
         
         $questionsMasterDetails = DB::table('questions')->
-        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->select('questions.*')->
+        join('questions_detail', 'questions.id', '=', 'questions_detail.questionID')->
+        join('scores_detail', 'scores_detail.questionID', '=', 'questions_detail.questionID')->select('questions.*')->
         where([ 
             [ 'questions.trash', '<>', trashed() ],
             [ 'questions_detail.trash', '<>', trashed() ],
+            [ 'scores_detail.number', '=','1' ],
         ])->
         whereIn('questions.id',$questionIDs)->get()->first();
 
         // ---------------------------------------------------------------------------------------- //
         
-        $questionsSlaveDetails = DB::table('questions_detail')->select(['questions_detail.*','scores_detail.number'])->
-        join('scores_detail', 'questions_detail.questionID', '=', 'scores_detail.questionID')->
+        $questionsSlaveDetails = DB::table('questions_detail')->select(['questions_detail.*'])->
         where([ 
             [ 'questions_detail.questionID', '=', $questionsMasterDetails->id ],
-            [ 'scores_detail.trash', '<>', trashed() ],
             [ 'questions_detail.trash', '<>', trashed() ],
         ])->get()->toArray();
 
