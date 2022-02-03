@@ -77,7 +77,7 @@
                                                 <a class="btn btn-info btn-sm" href="{{route('attendance',['examID'=>$eachExam->id])}}">
                                                     شرکت در آزمون
                                                 </a> 
-                                                @if ($eachExam->isReviewAllowed)
+                                                @if ($eachExam->isReviewAllowed && $eachExam->isExamFinished )
                                                     <a class="btn btn-info btn-sm" href="{{ route('examResult', [ 'examID' => $eachExam->id ]) }}">
                                                         مشاهده نمره
                                                     </a> 

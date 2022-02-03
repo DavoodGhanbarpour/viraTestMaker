@@ -93,6 +93,11 @@ class ExamController extends Controller
             [ 'exams.trash', '<>', trashed() ], 
         ])->get()->toArray();
             
+
+
+        foreach ($params['exams'] as &$value) 
+            $value->isExamFinished = $this->isExamHasFinishTime( $value->id );
+
         return view('pages.exams.general', $params);
     }
 
@@ -536,11 +541,12 @@ class ExamController extends Controller
         $isFinish =  DB::table('scores')->
         select([ 'scores.timeFinish' ])->
         where([ 
+            [ 'scores.studentID', '=', Auth::user()->id ],
             [ 'scores.examID', '=', $examID ],
             [ 'scores.trash', '<>', trashed() ],
         ])->get()->first();
         
-        if( $isFinish->timeFinish )
+        if( @$isFinish->timeFinish )
             return true;
         else
             return false;

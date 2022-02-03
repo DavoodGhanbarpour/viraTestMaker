@@ -311,7 +311,8 @@
         var type =  rowSelector.val();
         rowSelector.parent().parent().find('.questionsTypeSection').addClass('d-none');
         rowSelector.parent().parent().find('.questionsTypeSection').find('input').prop('disabled',true);
-        rowSelector.parent().parent().find('.questionsTypeSection').find('textarea').prop('readonly',true);
+        rowSelector.parent().parent().find('.questionsTypeSection').find('textarea').prop('disabled',true);
+        rowSelector.parent().parent().find('.questionsTypeSection').find('textarea').prop('readonly',false);
 
         switch(type)
         {
@@ -329,6 +330,8 @@
 
             case 'description':
                 rowSelector.parent().parent().find('.questionsTypeSection[data-question-type=description]').removeClass('d-none');
+                rowSelector.parent().parent().find('.questionsTypeSection[data-question-type=description]').find('textarea').prop('disabled',false);
+                rowSelector.parent().parent().find('.questionsTypeSection[data-question-type=description]').find('textarea').prop('readonly',true);
                 break;
 
 
