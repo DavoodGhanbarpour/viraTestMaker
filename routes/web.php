@@ -42,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
      */
     Route::get('/courses', [ CourseController::class, 'index' ])->name('courses');
     Route::get('/exams/{id}', [ ExamController::class, 'examsOfAClass' ])->name('examsOfACourse');
-    Route::get('/exam/result/{examID}', [ ExamController::class, 'showResultOfExam' ])->name('examResult');
+    Route::get('/exam/result/{examID}/{studentID?}', [ ExamController::class, 'showResultOfExam' ])->name('examResult');
     Route::get('/attendance/{examID}', [ ExamController::class, 'attendance' ])->name('attendance');
     Route::get('/attendance/{examID}/{questionID}', [ ExamController::class, 'attendance' ])->name('attendanceWithQuestion');
     Route::post('/attendance/answer/{questionID}/{moveType?}', [ ExamController::class, 'updateExamQuestionResult' ])->name('updateExamQuestion');

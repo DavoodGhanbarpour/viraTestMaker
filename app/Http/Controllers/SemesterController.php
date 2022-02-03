@@ -84,7 +84,7 @@ class SemesterController extends Controller
 
         $affected = DB::table('semesters')
         ->where('id', '=' ,$semesterID)
-        ->update([ 'trash' => trashed() ]);
+        ->delete();
 
         if( $affected )
             return back()->with('flashMessage', messageErrors( 200 ) );

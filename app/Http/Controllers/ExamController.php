@@ -205,13 +205,15 @@ class ExamController extends Controller
 
 
     
-    public function showResultOfExam($examID)
+    public function showResultOfExam($examID,$studentID)
     {
+        if( !$studentID )
+            $studentID = Auth::user()->id ;
         $params     = [
-            'questions'         => $this->getQuestionsResultByExamID( $examID, Auth::user()->id ) ?? [],
+            'questions'         => $this->getQuestionsResultByExamID( $examID, $studentID) ?? [],
             'examID'            => $examID,
-            'totalScoreOfUser'  => $this->sumOfScoresAchived( $examID, Auth::user()->id ),
-            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, Auth::user()->id )
+            'totalScoreOfUser'  => $this->sumOfScoresAchived( $examID, $studentID ),
+            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, $studentID)
         ];
         // dd($params);
         return view('pages.exams.result', $params);

@@ -65,6 +65,9 @@
                                     </td>
                                     <td>
                                         <div class="btn-list flex-nowrap">
+                                            <a class="btn btn-info btn-sm" href="{{ route('examResult', [ 'examID' => $eachExam->id,'studentID' => $eachExam->studentID ]) }}">
+                                                نمایش جزئیات
+                                            </a> 
                                             <a class="btn btn-info btn-sm" href="{{ route('addScore', [ 'examID' => $eachExam->id, 'studentID' => $eachExam->studentID ]) }}">
                                                 تصحیح آزمون
                                             </a> 
