@@ -57,21 +57,21 @@
                                         <div class="row pb-2">
                                             <div class="col-2 d-flex align-items-center justify-content-center">
                                                 @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][0]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    $selected = ( @$eachQuestion['slavesMultiOption'][0]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ;
                                                 @endphp 
-                                                <input type="radio" name="correctAnswer" disabled value="1"  {{$selected}}>
+                                                <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="1"  {{$selected}}>
                                             </div>
                                             <div class="col-10">
-                                                <input type="text" class="form-control" disabled name="answer1" value="{{ $eachQuestion['slavesMultiOption'][0]->optionTitle }}" required>
+                                                <input type="text" class="form-control" disabled name="answer1" value="{{ $eachQuestion['slavesMultiOption'][0]->optionTitle }}" required >
                                             </div>
                                         </div>
 
                                         <div class="row pb-2">
                                             <div class="col-2 d-flex align-items-center justify-content-center">
                                                 @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][1]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    $selected = ( @$eachQuestion['slavesMultiOption'][1]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ;
                                                 @endphp 
-                                                <input type="radio" name="correctAnswer" disabled value="2"  {{ ( $eachQuestion['slavesMultiOption'][1]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="2"  {{ ( @$eachQuestion['slavesMultiOption'][1]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ; }}>
                                             </div>
                                             <div class="col-10">
                                                 <input type="text"  class="form-control" disabled name="answer2" value="{{ $eachQuestion['slavesMultiOption'][1]->optionTitle }}" required>
@@ -81,9 +81,9 @@
                                         <div class="row pb-2">
                                             <div class="col-2 d-flex align-items-center justify-content-center">
                                                 @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][2]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    $selected = ( @$eachQuestion['slavesMultiOption'][2]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ;
                                                 @endphp 
-                                                <input type="radio" name="correctAnswer" disabled value="3"  {{ ( $eachQuestion['slavesMultiOption'][2]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="3"  {{ ( @$eachQuestion['slavesMultiOption'][2]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ; }}>
                                             </div>
                                             <div class="col-10">
                                                 <input type="text" class="form-control" disabled name="answer3" value="{{ $eachQuestion['slavesMultiOption'][2]->optionTitle }}" required>
@@ -93,9 +93,9 @@
                                         <div class="row pb-2">
                                             <div class="col-2 d-flex align-items-center justify-content-center">
                                                 @php
-                                                    $selected = ( $eachQuestion['slavesMultiOption'][3]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    $selected = ( @$eachQuestion['slavesMultiOption'][3]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ;
                                                 @endphp 
-                                                <input type="radio" name="correctAnswer" disabled value="4"  {{ ( $eachQuestion['slavesMultiOption'][3]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="4"  {{ ( @$eachQuestion['slavesMultiOption'][3]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ; }}>
                                             </div>
                                             <div class="col-10">
                                                 <input type="text" class="form-control" disabled name="answer4" value="{{ $eachQuestion['slavesMultiOption'][3]->optionTitle }}" required>
@@ -107,9 +107,9 @@
                                         <div class="row pb-2">
                                             <div class="col-2 d-flex align-items-center justify-content-center">
                                                 @php
-                                                    $selected = ( $eachQuestion['slavesTrueFlase'][0]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    $selected = ( @$eachQuestion['slavesTrueFlase'][0]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer ) ? 'checked' : '' ;
                                                 @endphp 
-                                                <input type="radio" name="correctAnswer" disabled value="1"  {{ ( $eachQuestion['slavesTrueFlase'][0]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="1"  {{ ( @$eachQuestion['slavesTrueFlase'][0]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer  ) ? 'checked' : '' ; }}>
                                             </div>
                                             <div class="col-10">
                                                 <input type="text" class="form-control" disabled name="answer1" value="{{ $eachQuestion['slavesTrueFlase'][0]->optionTitle }}" required>
@@ -119,9 +119,9 @@
                                         <div class="row pb-2">
                                             <div class="col-2 d-flex align-items-center justify-content-center">
                                                 @php
-                                                    $selected = ( $eachQuestion['slavesTrueFlase'][1]->correctAnswer == "true" ) ? 'checked' : '' ;
+                                                    $selected = ( @$eachQuestion['slavesTrueFlase'][1]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer  ) ? 'checked' : '' ;
                                                 @endphp 
-                                                <input type="radio" name="correctAnswer" disabled value="2"  {{ ( $eachQuestion['slavesTrueFlase'][1]->correctAnswer == "true" ) ? 'checked' : '' ; }}>
+                                                <input type="radio" name="correctAnswer{{$eachQuestion['id']}}" disabled value="2"  {{ ( @$eachQuestion['slavesTrueFlase'][1]->slaveID == $assocArrayOfAnswers[$eachQuestion['id']]->answer  ) ? 'checked' : '' ; }}>
                                             </div>
                                             <div class="col-10">
                                                 <input type="text"  class="form-control" disabled name="answer2" value="{{ $eachQuestion['slavesTrueFlase'][1]->optionTitle }}" required>
@@ -135,7 +135,7 @@
                                                 &nbsp;
                                             </div>
                                             <div class="col-10">
-                                                <textarea class="form-control" name="answer" disabled rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
+                                                <textarea class="form-control" name="answer" disabled rows="3">{{ @$assocArrayOfAnswers[$eachQuestion['id']]->answer }}</textarea>
                                             </div>
                                         </div>
                                     </div>

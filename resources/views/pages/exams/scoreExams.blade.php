@@ -137,7 +137,7 @@
                                                 &nbsp;
                                             </div>
                                             <div class="col-10">
-                                                <textarea class="form-control" name="answer" readonly rows="3">{{ $eachQuestion['slavesDescription'][0]->optionTitle }}</textarea>
+                                                <textarea class="form-control" name="answer" readonly rows="3">{{ $assocArrayOfAnswers[$eachQuestion['id']]->answer }}</textarea>
                                             </div>
                                         </div>
                                     </div>

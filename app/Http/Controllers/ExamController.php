@@ -163,7 +163,8 @@ class ExamController extends Controller
             'examID'            => $examID,
             'studentID'         => $studentID,
             'studentName'       => DB::table('users')->select('name')->where('id','=',$studentID)->get()->first()->name,
-            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, $studentID )
+            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, $studentID ),
+            'assocArrayOfAnswers'=> $this->getAnswerAsAssocArray( $examID, $studentID )
         ];
 
         if( !$params['questions'] )
@@ -205,7 +206,7 @@ class ExamController extends Controller
 
 
     
-    public function showResultOfExam($examID,$studentID)
+    public function showResultOfExam($examID,$studentID = null)
     {
         if( !$studentID )
             $studentID = Auth::user()->id ;
@@ -213,7 +214,8 @@ class ExamController extends Controller
             'questions'         => $this->getQuestionsResultByExamID( $examID, $studentID) ?? [],
             'examID'            => $examID,
             'totalScoreOfUser'  => $this->sumOfScoresAchived( $examID, $studentID ),
-            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, $studentID)
+            'assocArrayOfScores'=> $this->getScoresAsAssocArray( $examID, $studentID),
+            'assocArrayOfAnswers'=> $this->getAnswerAsAssocArray( $examID, $studentID )
         ];
         // dd($params);
         return view('pages.exams.result', $params);
@@ -239,6 +241,28 @@ class ExamController extends Controller
         return $result;
 
     }
+
+      
+    private function getAnswerAsAssocArray( $examID, $studentID )
+    {
+        $result = [];
+        $arrays = DB::table('scores_detail')->
+        join('scores', 'scores.id', '=', 'scores_detail.scoreID')->
+        select([ 'scoreIfCorrect', 'questionID', 'answer' ])->
+        where([ 
+            [ 'examID', '=', $examID ],
+            [ 'studentID', '=', $studentID ],
+            [ 'scores.trash', '<>', trashed() ],
+            [ 'scores_detail.trash', '<>', trashed() ],
+        ])->get()->toArray();
+
+        foreach ($arrays as $value) 
+            $result[ $value->questionID ] = $value;
+
+        return $result;
+
+    }
+
 
     private function sumOfScoresAchived($examID, $studentID)
     {
@@ -382,6 +406,8 @@ class ExamController extends Controller
 
     private function getScoreOfQuestion ( $questionID )
     {
+        if( !is_numeric( $questionID ) )
+            return 0;
         return DB::table('questions_detail')->
         join('questions', 'questions.id', '=', 'questions_detail.questionID')->
         select([ 'questions.score' ])->
