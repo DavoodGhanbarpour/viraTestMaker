@@ -100,6 +100,37 @@ class ExamController extends Controller
 
         return view('pages.exams.general', $params);
     }
+    
+    
+    public function examScores()
+    {
+        $params['exams'] =  DB::table('exams')->
+        join('scores', 'scores.examID', '=', 'exams.id')->
+        join('classes', 'classes.id', '=', 'exams.classID')->
+        join('courses', 'courses.id', '=', 'classes.courseID')->
+        join('users', 'scores.studentID', '=', 'users.id')->
+        select([ 
+            'courses.title as courseTitle',
+            'scores.timeStart',
+            'scores.timeFinish',
+            'users.name as studentName',
+            'exams.id',
+            'exams.title',
+            'users.id as studentID' 
+        ])->
+        where([ 
+            [ 'users.id', '=', Auth::user()->id ], 
+            [ 'users.trash', '<>', trashed() ], 
+            [ 'exams.trash', '<>', trashed() ], 
+            [ 'scores.trash', '<>', trashed() ], 
+            [ 'scores.timeFinish', '<>', '0' ], 
+        ])->get()->toArray();
+
+        foreach ($params['exams'] as &$value) 
+            $value->sumOfExam = $this->sumOfScoresAchived( $value->id, $value->studentID );
+
+        return view('pages.exams.scoresReport', $params);
+    }
 
     public function adminExams()
     {
@@ -188,7 +219,7 @@ class ExamController extends Controller
                 [ 'scores.trash', '<>' ,trashed() ],
                 [ 'scores_detail.trash', '<>' ,trashed() ],
             ])
-            ->update([ 'scoreIfCorrect' => $score ]);
+            ->update([ 'scoreIfCorrect' => toEngNumbers( $score ?? 0 ) ]);
         }
 
 

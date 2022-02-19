@@ -41,6 +41,7 @@ Route::middleware(['auth'])->group(function () {
      * General Parts
      */
     Route::get('/courses', [ CourseController::class, 'index' ])->name('courses');
+    Route::get('/scoresReport', [ ExamController::class, 'examScores' ])->name('scoresReport');
     Route::get('/exams/{id}', [ ExamController::class, 'examsOfAClass' ])->name('examsOfACourse');
     Route::get('/exam/result/{examID}/{studentID?}', [ ExamController::class, 'showResultOfExam' ])->name('examResult');
     Route::get('/attendance/{examID}', [ ExamController::class, 'attendance' ])->name('attendance');
